@@ -286,9 +286,25 @@ $("btn-start").onclick = start;
 $("btn-back").onclick = ()=>{ if(cur>0){ cur--; renderQ();}};
 $("btn-retry").onclick = start;
 $("btn-card").onclick = makeCard;
+async function getCardFile(){
+if($("card-preview").style.display === "none" || !$("card-img").src.startsWith("blob:")){
+makeCard();
+for(let i=0;i<40;i++){ await new Promise(r=>setTimeout(r,100)); if($("card-img").src.startsWith("blob:")) break; }
+}
+if(!$("card-img").src.startsWith("blob:")) return null;
+const b = await (await fetch($("card-img").src)).blob();
+return new File([b], "renai-doubutsu-" + resultType.id + ".png", { type:"image/png" });
+}
 $("btn-share").onclick = async ()=>{
 const url = "https://tosh1000950.github.io/shindan/animal-love/share/" + resultType.id + ".html";
 const text = shareText();
+try{
+const file = await getCardFile();
+if(file && navigator.canShare && navigator.canShare({ files:[file] })){
+await navigator.share({ files:[file], text:text, url:url });
+return;
+}
+}catch(e){ if(e && e.name === "AbortError"){ return; } }
 if(navigator.share){
 try{ await navigator.share({ title:"恋愛どうぶつ診断", text:text, url:url }); return; }
 catch(e){ if(e && e.name === "AbortError"){ return; } }
