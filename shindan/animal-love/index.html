@@ -301,12 +301,12 @@ const text = shareText();
 try{
 const file = await getCardFile();
 if(file && navigator.canShare && navigator.canShare({ files:[file] })){
-await navigator.share({ files:[file], text:text, url:url });
+if(/iPhone|iPad|iPod/.test(navigator.userAgent)){ await navigator.share({ files:[file], text:text + "\n" + url }); } else { await navigator.share({ files:[file], text:text, url:url }); }
 return;
 }
 }catch(e){ if(e && e.name === "AbortError"){ return; } }
 if(navigator.share){
-try{ await navigator.share({ title:"恋愛どうぶつ診断", text:text, url:url }); return; }
+try{ await navigator.share({ title:"恋愛どうぶつ診断", text:text + "\n" + url }); return; }
 catch(e){ if(e && e.name === "AbortError"){ return; } }
 }
 const intent = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(text) + "&url=" + encodeURIComponent(url);
