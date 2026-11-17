@@ -276,6 +276,7 @@ function startQuiz(resume){
   show("scr-gender");
 }
 function showQuestion(){
+  if (idx >= QUESTIONS.length) { showResult(); return; }
   if (idx === 10 && answers.length === 10 && !breakShown) { breakShown = true; show("scr-break"); return; }
   const q = QUESTIONS[idx];
   $("q-num").textContent = idx + 1;
