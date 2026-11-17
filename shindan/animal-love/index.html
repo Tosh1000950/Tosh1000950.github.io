@@ -96,6 +96,11 @@ footer a{ color:var(--sub);}
 </div>
 <button class="btn btn-main" id="btn-card">📸 結果カードを画像で保存</button>
 <button class="btn btn-sub" id="btn-share">𝕏 で結果をシェア</button>
+<div id="card-preview" style="display:none;margin-top:16px;text-align:center;">
+<img id="card-img" alt="結果カード" style="width:100%;max-width:340px;border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,.15);">
+<p style="color:var(--sub);font-size:12px;margin:10px 0;">画像を長押し（PCでは右クリック）でも保存できます</p>
+<a id="card-dl" class="btn btn-main" href="#" download style="text-decoration:none;margin-top:0;">⬇ この画像をダウンロード</a>
+</div>
 <button class="btn btn-sub" id="btn-retry">もう一度診断する</button>
 <div class="collection" id="collection-result"></div>
 <div class="alltypes">
@@ -244,42 +249,53 @@ renderGrid($("grid-result")); renderCollection();
 show("s-result");
 }
 function shareText(){
-return `わたしはでした！ ${resultType.catch}\nあなたは何タイプ？ #恋愛どうぶつ診断`;
+return `わたしは「${resultType.name}」でした！ ${resultType.catch}\nあなたは何タイプ？ #恋愛どうぶつ診断`;
 }
 function makeCard(){
 const c = document.createElement("canvas"); c.width=1080; c.height=1350;
 const x = c.getContext("2d");
+const img = new Image();
+img.onload = ()=>{
 x.fillStyle = resultType.color; x.fillRect(0,0,1080,1350);
 x.fillStyle = "#ffffff"; x.beginPath(); x.roundRect(60,60,960,1230,48); x.fill();
 x.textAlign = "center"; x.fillStyle = "#7a7284";
 x.font = "600 40px sans-serif"; x.fillText("恋愛どうぶつ診断", 540, 190);
-const img = new Image();
-img.onload = ()=>{
 x.save(); x.beginPath(); x.arc(540,360,165,0,Math.PI*2); x.clip();
 x.drawImage(img, 375, 195, 330, 330); x.restore();
-const a = document.createElement("a");
-a.download = "renai-doubutsu-" + resultType.id + ".png";
-a.href = c.toDataURL("image/png"); a.click();
-};
-img.src = "assets/" + resultType.id + ".jpg";
 x.fillStyle = "#3a3340"; x.font = "800 58px sans-serif";
-const name = resultType.name;
-if(x.measureText(name).width > 880){ x.font = "800 46px sans-serif";}
-x.fillText(name, 540, 590);
+if(x.measureText(resultType.name).width > 880){ x.font = "800 42px sans-serif"; }
+x.fillText(resultType.name, 540, 590);
 x.fillStyle = "#ff7aa8"; x.font = "700 44px sans-serif";
 x.fillText(resultType.catch, 540, 690);
 x.fillStyle = "#7a7284"; x.font = "400 34px sans-serif";
 x.fillText("相性◎ " + resultType.compat.join(" ・ "), 540, 800);
 x.fillStyle = "#b9aec2"; x.font = "600 36px sans-serif";
 x.fillText("tosh1000950.github.io", 540, 1180);
+c.toBlob(b=>{
+if(!b){ return; }
+const u = URL.createObjectURL(b);
+$("card-img").src = u;
+const dl = $("card-dl"); dl.href = u; dl.download = "renai-doubutsu-" + resultType.id + ".png";
+$("card-preview").style.display = "block";
+$("card-preview").scrollIntoView({behavior:"smooth"});
+}, "image/png");
+};
+img.src = "assets/" + resultType.id + ".jpg";
 }
 $("btn-start").onclick = start;
 $("btn-back").onclick = ()=>{ if(cur>0){ cur--; renderQ();}};
 $("btn-retry").onclick = start;
 $("btn-card").onclick = makeCard;
-$("btn-share").onclick = ()=>{
+$("btn-share").onclick = async ()=>{
 const url = "https://tosh1000950.github.io/shindan/animal-love/";
-window.open("https://twitter.com/intent/tweet?text=" + encodeURIComponent(shareText()) + "&url=" + encodeURIComponent(url), "_blank");
+const text = shareText();
+if(navigator.share){
+try{ await navigator.share({ title:"恋愛どうぶつ診断", text:text, url:url }); return; }
+catch(e){ if(e && e.name === "AbortError"){ return; } }
+}
+const intent = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(text) + "&url=" + encodeURIComponent(url);
+const w = window.open(intent, "_blank");
+if(!w){ location.href = intent; }
 };
 renderGrid($("grid-start")); renderCollection();
 </script>
