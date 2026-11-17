@@ -287,7 +287,7 @@ $("btn-back").onclick = ()=>{ if(cur>0){ cur--; renderQ();}};
 $("btn-retry").onclick = start;
 $("btn-card").onclick = makeCard;
 $("btn-share").onclick = async ()=>{
-const url = "https://tosh1000950.github.io/shindan/animal-love/";
+const url = "https://tosh1000950.github.io/shindan/animal-love/share/" + resultType.id + ".html";
 const text = shareText();
 if(navigator.share){
 try{ await navigator.share({ title:"恋愛どうぶつ診断", text:text, url:url }); return; }
