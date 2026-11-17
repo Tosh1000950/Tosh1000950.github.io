@@ -227,6 +227,7 @@ const EMOJI = { diamond:"💎", ruby:"🔴", topaz:"🟡", garnet:"🍷", pearl:
 let gender = "unknown";
 let idx = 0;
 let answers = []; // 選択した重みの配列
+let breakShown = false; // 休憩画面を出したかどうか（出し直しループ防止）
 let resultType = null;
 let scores = [0,0,0,0];
 
@@ -271,11 +272,11 @@ function startQuiz(resume){
     const p = loadProgress();
     if (p) { idx = p.idx; answers = p.answers.slice(); gender = p.gender || "unknown"; showQuestion(); return; }
   }
-  idx = 0; answers = []; gender = "unknown";
+  idx = 0; answers = []; gender = "unknown"; breakShown = false;
   show("scr-gender");
 }
 function showQuestion(){
-  if (idx === 10 && answers.length === 10) { show("scr-break"); return; }
+  if (idx === 10 && answers.length === 10 && !breakShown) { breakShown = true; show("scr-break"); return; }
   const q = QUESTIONS[idx];
   $("q-num").textContent = idx + 1;
   $("q-pct").textContent = Math.round(idx / QUESTIONS.length * 100);
@@ -333,7 +334,7 @@ function shareText(){
 $("btn-start").onclick = () => { sendStat("diagnosis_start"); startQuiz(false); };
 $("btn-resume").onclick = () => startQuiz(true);
 document.querySelectorAll("[data-gender]").forEach(b => {
-  b.onclick = () => { gender = b.getAttribute("data-gender"); idx = 0; answers = []; saveProgress(); showQuestion(); };
+  b.onclick = () => { gender = b.getAttribute("data-gender"); idx = 0; answers = []; breakShown = false; saveProgress(); showQuestion(); };
 });
 $("btn-back").onclick = () => { if (idx > 0) { idx--; showQuestion(); } };
 $("btn-break-next").onclick = () => showQuestion();
