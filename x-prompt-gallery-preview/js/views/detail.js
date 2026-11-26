@@ -17,6 +17,7 @@ import {
   extractTweetId,
   formatDateJa,
   formatLikesExactJa,
+  formatOriginalPostDateJa,
   getMediaTypeLabel,
   getPostMediaGallery,
   getPromptLanguageLabel,
@@ -586,7 +587,7 @@ function buildEditorialBlock(post, onSelectTag, onClose) {
     metaEntries.push(['収集時点のいいね数', `♥ ${formatLikesExactJa(post.likesAtCuration)}`]);
   }
   metaEntries.push(
-    ['元の投稿日', formatDateJa(post.originalPostedAt)],
+    ['元の投稿日', formatOriginalPostDateJa(post.originalPostedAt, post.parentPostUrl)],
     ['掲載日', formatDateJa(post.publishedAt)]
   );
   if (typeof post.reactionNote === 'string' && post.reactionNote.trim()) {
