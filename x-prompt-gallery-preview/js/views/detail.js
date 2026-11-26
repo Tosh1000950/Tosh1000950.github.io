@@ -16,12 +16,15 @@ import {
   buildPbsImageUrl,
   extractTweetId,
   formatDateJa,
+  formatLikesExactJa,
   getMediaTypeLabel,
   getPostMediaGallery,
   getPromptLanguageLabel,
   getPromptLocationLabel,
   getSafeXUrl,
+  getStyleLabel,
   hasSeparatePromptPost,
+  isValidLikesCount,
   isVideoPost,
   normalizeHandle,
 } from '../url-utils.js';
@@ -568,18 +571,24 @@ function buildEditorialBlock(post, onSelectTag, onClose) {
   authorCard.append(authorInfo, authorActions);
   wrap.appendChild(authorCard);
 
-  // Meta info grid (SPEC §5.2 items 8, 9, 10 & 11)
+  // Meta info grid (SPEC §5.2 items 8, 9, 10, 11, 12 & 13)
   const dl = document.createElement('dl');
   dl.className = 'detail-meta-grid';
 
   const metaEntries = [
     ['対応モデル', post.model],
     ['カテゴリ', post.category],
+    ['作風', getStyleLabel(post.style)],
     ['媒体', getMediaTypeLabel(post.mediaType)],
     ['プロンプト言語', getPromptLanguageLabel(post.promptLanguage)],
-    ['掲載日', formatDateJa(post.publishedAt)],
-    ['元の投稿日', formatDateJa(post.originalPostedAt)],
   ];
+  if (isValidLikesCount(post.likesAtCuration)) {
+    metaEntries.push(['収集時点のいいね数', `♥ ${formatLikesExactJa(post.likesAtCuration)}`]);
+  }
+  metaEntries.push(
+    ['元の投稿日', formatDateJa(post.originalPostedAt)],
+    ['掲載日', formatDateJa(post.publishedAt)]
+  );
   if (typeof post.reactionNote === 'string' && post.reactionNote.trim()) {
     metaEntries.push(['収集時点の反応メモ', post.reactionNote.trim()]);
   }
