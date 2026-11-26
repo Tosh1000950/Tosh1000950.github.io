@@ -1,0 +1,115 @@
+{
+  "_schemaVersion": "2.0",
+  "_policyNotice": "三方良し仕様書 v2 準拠: プロンプト本文フィールドは一切設けません。画像ファイルもリポジトリに保存せず、Xの画像CDN（pbs.twimg.com）のURL文字列のみを記録します。公開するレコードのみ enabled: true にしてください。",
+  "siteConfig": {
+    "siteName": "【仮称】Xバズプロンプト図鑑",
+    "isPlaceholderName": true,
+    "tagline": "画像もプロンプトも抜きません。一次ソースはXに置いたまま、作者のポストに返します。",
+    "siteUrl": "https://tosh1000950.github.io/x-prompt-gallery/",
+    "isPlaceholderUrl": true,
+    "operatorName": "Tosh1",
+    "operatorHubUrl": "https://tosh1000950.github.io/",
+    "contact": {
+      "submissionNote": "【未決定・仮置き】自薦・掲載依頼の受付窓口（Xリプライ／専用フォーム／GitHub等）を決定後、data/posts.json の siteConfig.contact に設定してください。",
+      "submissionUrl": "",
+      "removalNote": "【未決定・仮置き】掲載削除・修正依頼の受付先（専用フォームURL／メールアドレス／Xアカウント等）を決定後、data/posts.json の siteConfig.contact に設定してください。",
+      "removalUrl": "",
+      "removalEmail": ""
+    }
+  },
+  "weeklyIssues": [
+    {
+      "issueId": "TEMPLATE-WEEK-DO-NOT-ENABLE",
+      "enabled": false,
+      "isTemplate": true,
+      "title": "【テンプレート】2026年 第48週のバズプロンプトまとめ",
+      "publishedAt": "2026-11-26",
+      "intro": "ここにその週のトレンドや注目ポイントを運営者の言葉で2〜3行書きます。enabled を true にすると週刊まとめページに紹介文が表示されます。"
+    }
+  ],
+  "posts": [
+    {
+      "id": "TEMPLATE-RECORD-DO-NOT-ENABLE",
+      "enabled": false,
+      "isTemplate": true,
+      "_fieldGuide": {
+        "rule": "このレコードを複製して新しい掲載を作成してください。プロンプト本文の項目は仕様上存在しません（絶対に追加しないこと）。準備ができたら isTemplate と _fieldGuide を削除し、enabled を true に変更します。",
+        "promptLocationTypeOptions": "body（ポスト本文内） | reply（ツリー／自己リプライ内） | quote（引用ポスト内） | alt（画像のALTテキスト内） | linked_post（作者の別ポスト） | other（その他）",
+        "imagesNote": "Xで画像を開いて取得した https://pbs.twimg.com/media/... URL文字列のみを配列で入れます。一覧（small/medium）と詳細（large）のサイズ指定はサイト側がURLのnameパラメータで自動出し分けします。"
+      },
+      "title": "【テンプレート】日本語タイトル（運営者が作成：どんな画風・表現か一目で分かる名前）",
+      "summary": "運営者の言葉で書く1行要約（プロンプト本文の転記ではなく、見た目の特徴や使いどころを簡潔に説明）。",
+      "author": {
+        "name": "作者の表示名",
+        "handle": "author_handle_without_at"
+      },
+      "parentPostUrl": "https://x.com/author_handle_without_at/status/0000000000000000000",
+      "promptPostUrl": "https://x.com/author_handle_without_at/status/0000000000000000001",
+      "promptLocationType": "reply",
+      "promptLocationNote": "親ポストへの自己リプライ2番目にプロンプト全文があります（本文内なら「本文の後半」などと記載）。",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/media/REPLACE_WITH_MEDIA_ID?format=jpg&name=orig",
+          "alt": "画像の雰囲気を説明する簡潔な日本語テキスト（プロンプト本文は書かない）"
+        }
+      ],
+      "model": "対応画像生成モデル名（例: Midjourney v7 / FLUX / GPT Image / Nano Banana 等）",
+      "category": "カテゴリ（例: 人物・ポートレート / 風景・建築 / イラスト・アニメ / デザイン・タイポ / プロダクト 等）",
+      "tags": [
+        "タグ1",
+        "タグ2",
+        "タグ3"
+      ],
+      "publishedAt": "2026-11-26",
+      "originalPostedAt": "2026-11-25",
+      "reactionNote": "収集時点メモ（任意）：例「いいね 4.2万 / ブックマーク 1.8万（2026-11-26確認）」",
+      "guidance": "案内文（任意・1〜3行）：被写体や配色、時間帯の語句を差し替えると別シーンにも応用しやすい、など運営者の言葉で補足します。",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W48",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-26",
+        "status": "unchecked",
+        "removalRequested": false
+      }
+    },
+    {
+      "id": "TEST-EMBED-VERIFICATION-NASA",
+      "enabled": true,
+      "isTest": true,
+      "_testNotice": "【TESTレコード・本番無効】X公式埋め込み（twttr.widgets.createTweet遅延生成）および pbs.twimg.com 直リンク画像（name=small/medium/large出し分け）の技術検証にのみ使用した実在公開ポストです。本番公開用の実シードではなく、常に enabled: false のままにしてください（不要であれば削除しても問題ありません）。",
+      "title": "【TEST】埋め込み・画像直リンク動作検証用レコード（NASA公式ポスト）",
+      "summary": "詳細モーダル展開時の遅延埋め込み生成と、カード／詳細での直リンク画像サイズ切替を検証するためのテスト用レコードです。",
+      "author": {
+        "name": "NASA",
+        "handle": "NASA"
+      },
+      "parentPostUrl": "https://x.com/NASA/status/1546290906046816256",
+      "promptPostUrl": "https://x.com/NASA/status/1546290906046816256",
+      "promptLocationType": "body",
+      "promptLocationNote": "【TEST】本文内記載ケースの表示確認用メモ（実運用ではここにプロンプトの正確な位置を記載します）。",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/media/FXWHYkaXkAAXuzN?format=jpg&name=orig",
+          "alt": "技術検証に使用したNASA公式ポストの添付画像（直リンク）"
+        }
+      ],
+      "model": "TEST-Verification",
+      "category": "テスト検証",
+      "tags": [
+        "TEST",
+        "埋め込み検証"
+      ],
+      "publishedAt": "2026-11-26",
+      "originalPostedAt": "2022-07-11",
+      "reactionNote": "技術検証専用レコード（enabled: false）",
+      "guidance": "【TEST】運営者による応用メモ表示欄の確認用テキストです。",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W48",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-26",
+        "status": "ok",
+        "removalRequested": false
+      }
+    }
+  ]
+}
