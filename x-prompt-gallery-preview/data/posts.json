@@ -1,6 +1,6 @@
 {
-  "_schemaVersion": "2.0",
-  "_policyNotice": "三方良し仕様書 v2 準拠: プロンプト本文フィールドは一切設けません。画像ファイルもリポジトリに保存せず、Xの画像CDN（pbs.twimg.com）のURL文字列のみを記録します。公開するレコードのみ enabled: true にしてください。",
+  "_schemaVersion": "2.1",
+  "_policyNotice": "三方良し仕様書 v2.1 準拠: プロンプト本文フィールドは一切設けません。画像・動画ファイルもリポジトリに保存せず、Xの画像CDN（pbs.twimg.com）のURL文字列のみを記録します（動画ポストはサムネイル直リンク＋詳細の公式埋め込み内再生のみ）。公開するレコードのみ enabled: true にしてください。",
   "siteConfig": {
     "siteName": "【仮称】Xバズプロンプト図鑑",
     "isPlaceholderName": true,
@@ -9,10 +9,19 @@
     "isPlaceholderUrl": true,
     "operatorName": "Tosh1",
     "operatorHubUrl": "https://tosh1000950.github.io/",
+    "categories": [
+      "人物・ポートレート",
+      "イラスト・アニメ",
+      "風景・建築",
+      "デザイン・タイポ",
+      "プロダクト・食べ物",
+      "映像・シネマティック",
+      "その他・実験"
+    ],
     "contact": {
       "submissionNote": "【未決定・仮置き】自薦・掲載依頼の受付窓口（Xリプライ／専用フォーム／GitHub等）を決定後、data/posts.json の siteConfig.contact に設定してください。",
       "submissionUrl": "",
-      "removalNote": "【未決定・仮置き】掲載削除・修正依頼の受付先（専用フォームURL／メールアドレス／Xアカウント等）を決定後、data/posts.json の siteConfig.contact に設定してください。",
+      "removalNote": "【未決定・仮置き】確認コード方式による掲載削除・修正依頼の受付窓口（専用フォームURL／メールアドレス／Xアカウント等）を決定後、data/posts.json の siteConfig.contact に設定してください。",
       "removalUrl": "",
       "removalEmail": ""
     }
@@ -33,9 +42,13 @@
       "enabled": false,
       "isTemplate": true,
       "_fieldGuide": {
-        "rule": "このレコードを複製して新しい掲載を作成してください。プロンプト本文の項目は仕様上存在しません（絶対に追加しないこと）。準備ができたら isTemplate と _fieldGuide を削除し、enabled を true に変更します。",
+        "rule": "このレコードを複製して新しい掲載を作成してください。プロンプト本文の項目および動画ファイル直リンクは仕様上存在しません（絶対に追加しないこと）。準備ができたら isTemplate と _fieldGuide を削除し、enabled を true に変更します。",
         "promptLocationTypeOptions": "body（ポスト本文内） | reply（ツリー／自己リプライ内） | quote（引用ポスト内） | alt（画像のALTテキスト内） | linked_post（作者の別ポスト） | other（その他）",
-        "imagesNote": "Xで画像を開いて取得した https://pbs.twimg.com/media/... URL文字列のみを配列で入れます。一覧（small/medium）と詳細（large）のサイズ指定はサイト側がURLのnameパラメータで自動出し分けします。"
+        "mediaTypeOptions": "image（画像） | video（動画：一覧は videoThumbnail の直リンク画像＋▶バッジ、再生は詳細の公式埋め込みのみ）",
+        "videoThumbnailNote": "mediaType が video の場合は { \"url\": \"https://pbs.twimg.com/...\", \"alt\": \"...\" } を必須指定（ext_tw_video_thumb / amplify_video_thumb / tweet_video_thumb / media 等）。video.twimg.com や .mp4 の直リンクは禁止。mediaType が image の場合は null にします。",
+        "promptLanguageOptions": "ja（日本語） | en（英語） | zh（中国語） | ko（韓国語） | other（その他）",
+        "categoryOptions": "siteConfig.categories の固定語彙から1つ選択: 人物・ポートレート | イラスト・アニメ | 風景・建築 | デザイン・タイポ | プロダクト・食べ物 | 映像・シネマティック | その他・実験",
+        "imagesNote": "mediaType が image の場合は X で画像を開いて取得した https://pbs.twimg.com/media/... URL文字列を1件以上配列で入れます（mediaType が video の場合は空配列 [] で可）。一覧（small/medium）と詳細（large）のサイズ指定はサイト側がURLのnameパラメータで自動出し分けします。"
       },
       "title": "【テンプレート】日本語タイトル（運営者が作成：どんな画風・表現か一目で分かる名前）",
       "summary": "運営者の言葉で書く1行要約（プロンプト本文の転記ではなく、見た目の特徴や使いどころを簡潔に説明）。",
@@ -47,14 +60,17 @@
       "promptPostUrl": "https://x.com/author_handle_without_at/status/0000000000000000001",
       "promptLocationType": "reply",
       "promptLocationNote": "親ポストへの自己リプライ2番目にプロンプト全文があります（本文内なら「本文の後半」などと記載）。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "ja",
       "images": [
         {
           "url": "https://pbs.twimg.com/media/REPLACE_WITH_MEDIA_ID?format=jpg&name=orig",
           "alt": "画像の雰囲気を説明する簡潔な日本語テキスト（プロンプト本文は書かない）"
         }
       ],
-      "model": "対応画像生成モデル名（例: Midjourney v7 / FLUX / GPT Image / Nano Banana 等）",
-      "category": "カテゴリ（例: 人物・ポートレート / 風景・建築 / イラスト・アニメ / デザイン・タイポ / プロダクト 等）",
+      "model": "対応生成モデル名（例: Midjourney v7 / FLUX / GPT Image / Nano Banana / Kling / Sora / Veo 等）",
+      "category": "人物・ポートレート",
       "tags": [
         "タグ1",
         "タグ2",
@@ -87,6 +103,9 @@
       "promptPostUrl": "https://x.com/NASA/status/1546290906046816256",
       "promptLocationType": "body",
       "promptLocationNote": "【TEST】本文内記載ケースの表示確認用メモ（実運用ではここにプロンプトの正確な位置を記載します）。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "en",
       "images": [
         {
           "url": "https://pbs.twimg.com/media/FXWHYkaXkAAXuzN?format=jpg&name=orig",
@@ -94,7 +113,7 @@
         }
       ],
       "model": "TEST-Verification",
-      "category": "テスト検証",
+      "category": "その他・実験",
       "tags": [
         "TEST",
         "埋め込み検証"
