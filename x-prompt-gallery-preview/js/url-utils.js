@@ -250,6 +250,25 @@ export function normalizeHandle(handle) {
 }
 
 /**
+ * Normalize a tag string for tolerant matching against siteConfig.pinnedTags:
+ * - NFKC normalization (unifies full-width ASCII, spaces, hyphens, underscores)
+ * - Case-insensitive (toLowerCase)
+ * - Treats spaces, hyphens (ASCII & Unicode dashes), and underscores as equivalent/optional
+ *   (e.g. "Nano Banana", "nano banana", "nano-banana", "nano_banana", "NanoBanana" -> "nanobanana").
+ * Preserves Japanese katakana prolonged sound mark "ー" (U+30FC).
+ * @param {unknown} tag
+ * @returns {string}
+ */
+export function normalizeTagKey(tag) {
+  if (typeof tag !== 'string') return '';
+  return tag
+    .normalize('NFKC')
+    .trim()
+    .toLowerCase()
+    .replace(/[\s\-_\u2010-\u2015\u2212]+/g, '');
+}
+
+/**
  * Build X profile URL from author handle.
  * @param {string} handle
  * @returns {string | null}
