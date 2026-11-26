@@ -94,48 +94,1299 @@
       }
     },
     {
-      "id": "TEST-EMBED-VERIFICATION-NASA",
+      "id": "SEED-001",
       "enabled": true,
-      "isTest": true,
-      "_testNotice": "【TESTレコード・本番無効】X公式埋め込み（twttr.widgets.createTweet遅延生成）および pbs.twimg.com 直リンク画像（name=small/medium/large出し分け）の技術検証にのみ使用した実在公開ポストです。本番公開用の実シードではなく、常に enabled: false のままにしてください（不要であれば削除しても問題ありません）。",
-      "title": "【TEST】埋め込み・画像直リンク動作検証用レコード（NASA公式ポスト）",
-      "summary": "詳細モーダル展開時の遅延埋め込み生成と、カード／詳細での直リンク画像サイズ切替を検証するためのテスト用レコードです。",
+      "title": "Midjourney V6のマルチプロンプト新構造",
+      "summary": "V6アルファ公開週に「Style＋Subject＋色＋雰囲気::3 …」のマルチプロンプト構造を実例つきで解説した投稿。",
       "author": {
-        "name": "NASA",
-        "handle": "NASA"
+        "name": "Tatiana Tsiguleva",
+        "handle": "ciguleva"
       },
-      "parentPostUrl": "https://x.com/NASA/status/1546290906046816256",
-      "promptPostUrl": "https://x.com/NASA/status/1546290906046816256",
+      "parentPostUrl": "https://x.com/ciguleva/status/1737938267348341114",
+      "promptPostUrl": "https://x.com/ciguleva/status/1737938267348341114",
       "promptLocationType": "body",
-      "promptLocationNote": "【TEST】本文内記載ケースの表示確認用メモ（実運用ではここにプロンプトの正確な位置を記載します）。",
+      "promptLocationNote": "本文内で新構造と作例プロンプトを提示。続くリプライにも作例あり。",
       "mediaType": "image",
       "videoThumbnail": null,
       "promptLanguage": "en",
       "images": [
         {
-          "url": "https://pbs.twimg.com/media/FXWHYkaXkAAXuzN?format=jpg&name=orig",
-          "alt": "技術検証に使用したNASA公式ポストの添付画像（直リンク）"
+          "url": "https://pbs.twimg.com/media/GB5lg0SbEAETVG2.jpg?name=orig",
+          "alt": "Midjourney V6のマルチプロンプト新構造の作例画像"
         }
       ],
-      "model": "TEST-Verification",
-      "category": "その他・実験",
+      "model": "Midjourney V6",
+      "category": "人物・ポートレート",
       "style": "real",
       "tags": [
-        "TEST",
-        "埋め込み検証"
+        "Midjourney",
+        "マルチプロンプト",
+        "V6"
       ],
-      "publishedAt": "2026-11-26",
-      "originalPostedAt": "2022-07-11",
-      "likesAtCuration": 17000,
-      "reactionNote": "技術検証専用レコード（enabled: false）",
-      "guidance": "【TEST】運営者による応用メモ表示欄の確認用テキストです。",
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2023-12-21",
+      "likesAtCuration": 1254,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 1,254 / 表示 245,237 / リポスト 178",
+      "weeklyPickup": false,
+      "weeklyIssue": "2023-W51",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "構造の枠組みだけ借りて、被写体・色・雰囲気を差し替えると応用しやすい。"
+    },
+    {
+      "id": "SEED-002",
+      "enabled": true,
+      "title": "写真を1/7スケールフィギュア化する投稿",
+      "summary": "写真を机の上の1/7スケールフィギュアに変える投稿が世界的に拡散した起点。Google公式がプロンプトをリプライで配布した。",
+      "author": {
+        "name": "Google Gemini",
+        "handle": "GeminiApp"
+      },
+      "parentPostUrl": "https://x.com/GeminiApp/status/1962647019090256101",
+      "promptPostUrl": "https://x.com/GeminiApp/status/1962647019090256101",
+      "promptLocationType": "reply",
+      "promptLocationNote": "著者本人のリプライにプロンプト全文あり（リプライのURLは未確認のため親ポストURLを掲載）。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "en",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/media/Gzy4V72WwAA7PRR.jpg?name=orig",
+          "alt": "写真を1/7スケールフィギュア化する投稿の作例画像"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/Gzy4d2ka0AAtnQV.jpg?name=orig",
+          "alt": "写真を1/7スケールフィギュア化する投稿の作例画像"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/Gzy4h2qXUAA3FA5.jpg?name=orig",
+          "alt": "写真を1/7スケールフィギュア化する投稿の作例画像"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/Gzy4oMyWwAAmyWW.jpg?name=orig",
+          "alt": "写真を1/7スケールフィギュア化する投稿の作例画像"
+        }
+      ],
+      "model": "Nano Banana（Gemini 2.5 Flash Image）",
+      "category": "人物・ポートレート",
+      "style": "cg3d",
+      "tags": [
+        "フィギュア化",
+        "Nano Banana",
+        "バズの起点"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2025-09-01",
+      "likesAtCuration": 6314,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 6,314 / 表示 2,723,410 / リポスト 876",
+      "weeklyPickup": false,
+      "weeklyIssue": "2025-W36",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "写真の人物・背景を変えるだけで自分のフィギュア化が試せる。"
+    },
+    {
+      "id": "SEED-003",
+      "enabled": true,
+      "title": "ブログ記事を雑誌記事化する文字描画プロンプト",
+      "summary": "Nano Banana Proの文字描画力を、ブログ記事を雑誌記事に変えるプロンプトで実演した投稿。",
+      "author": {
+        "name": "fofr",
+        "handle": "fofrAI"
+      },
+      "parentPostUrl": "https://x.com/fofrAI/status/1991530971800182929",
+      "promptPostUrl": "https://x.com/fofrAI/status/1991530971800182929",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "en",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/media/G6NWMceXMAA4Yn8.jpg?name=orig",
+          "alt": "ブログ記事を雑誌記事化する文字描画プロンプトの作例画像"
+        }
+      ],
+      "model": "Nano Banana Pro",
+      "category": "デザイン・タイポ",
+      "style": "illust",
+      "tags": [
+        "文字描画",
+        "雑誌風",
+        "Nano Banana Pro"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2025-11-20",
+      "likesAtCuration": 2288,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 2,288 / 表示 416,847 / リポスト 187",
+      "weeklyPickup": false,
+      "weeklyIssue": "2025-W47",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "記事のテーマや見出し語を差し替えると別ジャンルの誌面にも使える。"
+    },
+    {
+      "id": "SEED-004",
+      "enabled": true,
+      "title": "有名人の金句カードを一発生成",
+      "summary": "有名人の金句カードを一発で生成する中文プロンプト。中文圏で多数が追試した。",
+      "author": {
+        "name": "Nicolechan",
+        "handle": "stark_nico99"
+      },
+      "parentPostUrl": "https://x.com/stark_nico99/status/1991718646570426763",
+      "promptPostUrl": "https://x.com/stark_nico99/status/1991718646570426763",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "zh",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/media/G6QBjQHbgAE3Yt_.jpg?name=orig",
+          "alt": "有名人の金句カードを一発生成の作例画像"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/G6QBiiracAInQ8z.jpg?name=orig",
+          "alt": "有名人の金句カードを一発生成の作例画像"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/G6QBii_acAIRxKd.jpg?name=orig",
+          "alt": "有名人の金句カードを一発生成の作例画像"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/G6QBikOaEAAmYkO.jpg?name=orig",
+          "alt": "有名人の金句カードを一発生成の作例画像"
+        }
+      ],
+      "model": "Nano Banana Pro",
+      "category": "デザイン・タイポ",
+      "style": "illust",
+      "tags": [
+        "金句カード",
+        "中文プロンプト",
+        "Nano Banana Pro"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2025-11-21",
+      "likesAtCuration": 518,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 518 / 表示 123,480 / リポスト 87",
+      "weeklyPickup": false,
+      "weeklyIssue": "2025-W47",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "人物と金句を差し替えると別テーマのカードが作れる。"
+    },
+    {
+      "id": "SEED-005",
+      "enabled": true,
+      "title": "画像を超精密フィギュア風の製品紹介ページに",
+      "summary": "画像を精密フィギュア風の製品紹介ページに変える日本語のフィギュア化プロンプト。",
+      "author": {
+        "name": "てんねん",
+        "handle": "munou_ac"
+      },
+      "parentPostUrl": "https://x.com/munou_ac/status/1991767005557583966",
+      "promptPostUrl": "https://x.com/munou_ac/status/1991767005557583966",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "ja",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/media/G6QsHDgacAANhhz.jpg?name=orig",
+          "alt": "画像を超精密フィギュア風の製品紹介ページにの作例画像"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/G6Qspn7bwAA0eGf.jpg?name=orig",
+          "alt": "画像を超精密フィギュア風の製品紹介ページにの作例画像"
+        }
+      ],
+      "model": "Nano Banana Pro",
+      "category": "プロダクト・食べ物",
+      "style": "cg3d",
+      "tags": [
+        "フィギュア化",
+        "製品紹介",
+        "日本語プロンプト"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2025-11-21",
+      "likesAtCuration": 934,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 934 / 表示 291,164 / リポスト 96",
+      "weeklyPickup": false,
+      "weeklyIssue": "2025-W47",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "商品名や仕様文を差し替えると別商品の紹介ページにも応用できる。"
+    },
+    {
+      "id": "SEED-006",
+      "enabled": true,
+      "title": "手描き風インフォグラフィックカード",
+      "summary": "手描き風インフォグラフィックカードを作る中文プロンプトを全文公開。教育・解説系で拡散した。",
+      "author": {
+        "name": "宝玉",
+        "handle": "dotey"
+      },
+      "parentPostUrl": "https://x.com/dotey/status/1991786129046044735",
+      "promptPostUrl": "https://x.com/dotey/status/1991786129046044735",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "zh",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/media/G6Q-oMuWkAAgOQr.jpg?name=orig",
+          "alt": "手描き風インフォグラフィックカードの作例画像"
+        }
+      ],
+      "model": "Nano Banana Pro",
+      "category": "デザイン・タイポ",
+      "style": "illust",
+      "tags": [
+        "インフォグラフィック",
+        "手描き風",
+        "中文プロンプト"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2025-11-21",
+      "likesAtCuration": 530,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 530 / 表示 182,094 / リポスト 99",
+      "weeklyPickup": false,
+      "weeklyIssue": "2025-W47",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "テーマと項目を差し替えると別分野の解説カードが作れる。"
+    },
+    {
+      "id": "SEED-007",
+      "enabled": true,
+      "title": "論文を板書風に要約する使い方",
+      "summary": "論文を板書風に要約する使い方で中文圏の研究者層に刺さった投稿。",
+      "author": {
+        "name": "歸藏(guizang.ai)",
+        "handle": "op7418"
+      },
+      "parentPostUrl": "https://x.com/op7418/status/1991806419948253508",
+      "promptPostUrl": "https://x.com/op7418/status/1991806419948253508",
+      "promptLocationType": "other",
+      "promptLocationNote": "本文は「提示词👇」とだけ書かれており、プロンプトはリプライ側と推定されるが未確認。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "zh",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/media/G6RRCifaAAAcSu6.jpg?name=orig",
+          "alt": "論文を板書風に要約する使い方の作例画像"
+        }
+      ],
+      "model": "Nano Banana",
+      "category": "デザイン・タイポ",
+      "style": "illust",
+      "tags": [
+        "論文要約",
+        "板書風",
+        "中文プロンプト"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2025-11-21",
+      "likesAtCuration": 429,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 429 / 表示 76,386 / リポスト 119",
+      "weeklyPickup": false,
+      "weeklyIssue": "2025-W47",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      }
+    },
+    {
+      "id": "SEED-008",
+      "enabled": true,
+      "title": "電車内広告風デザインの作例",
+      "summary": "電車内広告風デザインの作例。作者が「リプに貼ったプロンプト」と明記したリプライ配置型の投稿。",
+      "author": {
+        "name": "KAWAI",
+        "handle": "kawai_design"
+      },
+      "parentPostUrl": "https://x.com/kawai_design/status/1992142466255114727",
+      "promptPostUrl": "https://x.com/kawai_design/status/1992142466255114727",
+      "promptLocationType": "reply",
+      "promptLocationNote": "著者本人のリプライにプロンプトあり（本人が「リプに貼った」と明記。リプライのURLは未確認のため親ポストURLを掲載）。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "ja",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/media/G6WBYReawAAcp2x.jpg?name=orig",
+          "alt": "電車内広告風デザインの作例の作例画像"
+        }
+      ],
+      "model": "Nano Banana Pro",
+      "category": "デザイン・タイポ",
+      "style": "illust",
+      "tags": [
+        "広告風",
+        "日本語プロンプト",
+        "リプライ配置"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2025-11-22",
+      "likesAtCuration": 77,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 77 / 表示 10,050 / リポスト 10",
+      "weeklyPickup": false,
+      "weeklyIssue": "2025-W47",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      }
+    },
+    {
+      "id": "SEED-009",
+      "enabled": true,
+      "title": "座標で起きた出来事を画像化する一文プロンプト",
+      "summary": "「座標で起きた主要な出来事を画像化せよ」という一文プロンプトがタイタニックを描いた投稿。",
+      "author": {
+        "name": "AshutoshShrivastava",
+        "handle": "ai_for_success"
+      },
+      "parentPostUrl": "https://x.com/ai_for_success/status/1992212586746769736",
+      "promptPostUrl": "https://x.com/ai_for_success/status/1992212586746769736",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "en",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/media/G6XCycxaAAA8aHp.jpg?name=orig",
+          "alt": "座標で起きた出来事を画像化する一文プロンプトの作例画像"
+        }
+      ],
+      "model": "Nano Banana Pro",
+      "category": "風景・建築",
+      "style": "real",
+      "tags": [
+        "歴史シーン",
+        "一文プロンプト",
+        "Nano Banana Pro"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2025-11-22",
+      "likesAtCuration": 852,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 852 / 表示 52,787 / リポスト 50",
+      "weeklyPickup": false,
+      "weeklyIssue": "2025-W47",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "座標と出来事を差し替えると別時代・別場所の場面が描ける。"
+    },
+    {
+      "id": "SEED-010",
+      "enabled": true,
+      "title": "発明品を19世紀風の特許文書に変える型",
+      "summary": "発明品を19世紀風の特許文書に変えるテンプレート型プロンプトを定期配布するPrompt Studioの投稿。",
+      "author": {
+        "name": "Alexandra Aisling",
+        "handle": "AllaAisling"
+      },
+      "parentPostUrl": "https://x.com/AllaAisling/status/2004212035333365763",
+      "promptPostUrl": "https://x.com/AllaAisling/status/2004212035333365763",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "en",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/media/G8_mW4FWwAEwERE.jpg?name=orig",
+          "alt": "発明品を19世紀風の特許文書に変える型の作例画像"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/G8_m2ZVWEAAMG7y.jpg?name=orig",
+          "alt": "発明品を19世紀風の特許文書に変える型の作例画像"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/G8_m_7hWoAAw19u.jpg?name=orig",
+          "alt": "発明品を19世紀風の特許文書に変える型の作例画像"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/G8_nePrXUAAHvgn.jpg?name=orig",
+          "alt": "発明品を19世紀風の特許文書に変える型の作例画像"
+        }
+      ],
+      "model": "Nano Banana（Adobe Fireflyで実行）",
+      "category": "デザイン・タイポ",
+      "style": "illust",
+      "tags": [
+        "特許文書",
+        "ヴィンテージ",
+        "テンプレート"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2025-12-25",
+      "likesAtCuration": 373,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 373 / 表示 18,834 / リポスト 46",
+      "weeklyPickup": false,
+      "weeklyIssue": "2025-W52",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "発明品の名前と説明を差し替えると別発明の特許文書が作れる。"
+    },
+    {
+      "id": "SEED-011",
+      "enabled": true,
+      "title": "2x2グリッドのスタジオポートレートで年賀",
+      "summary": "2x2グリッドのスタジオポートレートで2026年賀を作る中文プロンプト。年末年始の時機で拡散した。",
+      "author": {
+        "name": "松果先森",
+        "handle": "songguoxiansen"
+      },
+      "parentPostUrl": "https://x.com/songguoxiansen/status/2005822648027091031",
+      "promptPostUrl": "https://x.com/songguoxiansen/status/2005822648027091031",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "zh",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/media/G9V-MszakAEAIBw.jpg?name=orig",
+          "alt": "2x2グリッドのスタジオポートレートで年賀の作例画像"
+        }
+      ],
+      "model": "Nano Banana Pro",
+      "category": "人物・ポートレート",
+      "style": "real",
+      "tags": [
+        "年賀",
+        "ポートレート",
+        "グリッド"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2025-12-30",
+      "likesAtCuration": 195,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 195 / 表示 58,927 / リポスト 32",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W01",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "人物と季節の要素を差し替えると別用途のグリッド写真が作れる。"
+    },
+    {
+      "id": "SEED-012",
+      "enabled": true,
+      "title": "実写なのにアニメ版のような漫改バトル動画",
+      "summary": "実写なのにアニメ版のような結果になった漫改バトル。15秒の対決シーン用プロンプトを全文公開した投稿。",
+      "author": {
+        "name": "John",
+        "handle": "johnAGI168"
+      },
+      "parentPostUrl": "https://x.com/johnAGI168/status/2021610292979876208",
+      "promptPostUrl": "https://x.com/johnAGI168/status/2021610292979876208",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "video",
+      "videoThumbnail": {
+        "url": "https://pbs.twimg.com/amplify_video_thumb/2021609784789880832/img/XoOOhs3hE2pm2oqB.jpg",
+        "alt": "実写なのにアニメ版のような漫改バトル動画の動画サムネイル"
+      },
+      "promptLanguage": "zh",
+      "images": [],
+      "model": "Seedance 2.0",
+      "category": "映像・シネマティック",
+      "style": "anime",
+      "tags": [
+        "漫改",
+        "バトル",
+        "Seedance"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2026-02-11",
+      "likesAtCuration": 358,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 358 / 表示 177,017 / リポスト 53",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W07",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "対決する能力と舞台を差し替えると別作品風のバトルが作れる。"
+    },
+    {
+      "id": "SEED-013",
+      "enabled": true,
+      "title": "現代田園美学の治癒系キッチン短片",
+      "summary": "現代田園美学の治癒系キッチン短片プロンプト。料理ASMR系の映像美で拡散した。",
+      "author": {
+        "name": "John",
+        "handle": "johnAGI168"
+      },
+      "parentPostUrl": "https://x.com/johnAGI168/status/2021818021354848258",
+      "promptPostUrl": "https://x.com/johnAGI168/status/2021818021354848258",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "video",
+      "videoThumbnail": {
+        "url": "https://pbs.twimg.com/amplify_video_thumb/2021817887371976704/img/4mYiIdzbujk8IyC2.jpg",
+        "alt": "現代田園美学の治癒系キッチン短片の動画サムネイル"
+      },
+      "promptLanguage": "zh",
+      "images": [],
+      "model": "Seedance 2.0",
+      "category": "映像・シネマティック",
+      "style": "real",
+      "tags": [
+        "キッチン",
+        "ASMR",
+        "治癒系"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2026-02-12",
+      "likesAtCuration": 157,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 157 / 表示 12,970 / リポスト 21",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W07",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "料理と時間帯を差し替えると別の癒し系短片が作れる。"
+    },
+    {
+      "id": "SEED-015",
+      "enabled": true,
+      "title": "超リアルなミディアムポートレート用テンプレート",
+      "summary": "超リアルなミディアムポートレート用テンプレート（差し替え可能な変数つき）が写真系ユーザに刺さった投稿。",
+      "author": {
+        "name": "Alexandra Aisling",
+        "handle": "AllaAisling"
+      },
+      "parentPostUrl": "https://x.com/AllaAisling/status/2038747862042063199",
+      "promptPostUrl": "https://x.com/AllaAisling/status/2038747862042063199",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "en",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/media/HEsVXD5bkAALqAB.jpg?name=orig",
+          "alt": "超リアルなミディアムポートレート用テンプレートの作例画像"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/HEsViRBWQAA7sDs.jpg?name=orig",
+          "alt": "超リアルなミディアムポートレート用テンプレートの作例画像"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/HEsVwtZagAE9zfm.jpg?name=orig",
+          "alt": "超リアルなミディアムポートレート用テンプレートの作例画像"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/HEsWUOmaUAAZ0-N.jpg?name=orig",
+          "alt": "超リアルなミディアムポートレート用テンプレートの作例画像"
+        }
+      ],
+      "model": "Midjourney V8",
+      "category": "人物・ポートレート",
+      "style": "real",
+      "tags": [
+        "ポートレート",
+        "テンプレート",
+        "Midjourney"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2026-03-30",
+      "likesAtCuration": 220,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 220 / 表示 9,125 / リポスト 31",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W14",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "変数の人物・表情・光を差し替えると別シーンのポートレートが作れる。"
+    },
+    {
+      "id": "SEED-016",
+      "enabled": true,
+      "title": "メープルシロップ商品広告の絵コンテ",
+      "summary": "メープルシロップ商品広告の1枚絵コンテ（ストーリーボード）を出すプロンプトを公開した投稿。",
+      "author": {
+        "name": "M-studioAi",
+        "handle": "Strength04_X"
+      },
+      "parentPostUrl": "https://x.com/Strength04_X/status/2096833097740493050",
+      "promptPostUrl": "https://x.com/Strength04_X/status/2096833097740493050",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "video",
+      "videoThumbnail": {
+        "url": "https://pbs.twimg.com/amplify_video_thumb/2096832865191460864/img/l-XKMnngPlC_fiv-.jpg",
+        "alt": "メープルシロップ商品広告の絵コンテの動画サムネイル"
+      },
+      "promptLanguage": "en",
+      "images": [],
+      "model": "Nano Banana 2 × Gemini Omni",
+      "category": "プロダクト・食べ物",
+      "style": "illust",
+      "tags": [
+        "絵コンテ",
+        "商品広告",
+        "ストーリーボード"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2026-09-07",
+      "likesAtCuration": 194,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 194 / 表示 5,591 / リポスト 31",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W37",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "商品とシーン数を差し替えると別商品の絵コンテが作れる。"
+    },
+    {
+      "id": "SEED-017",
+      "enabled": true,
+      "title": "「STORM」ファッションMV風プロンプト",
+      "summary": "「STORM」と題したファッション／ミュージックビデオ風プロンプトを全文公開した投稿。",
+      "author": {
+        "name": "Synthia",
+        "handle": "AIwithSynthia"
+      },
+      "parentPostUrl": "https://x.com/AIwithSynthia/status/2100067816162636164",
+      "promptPostUrl": "https://x.com/AIwithSynthia/status/2100067816162636164",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "video",
+      "videoThumbnail": {
+        "url": "https://pbs.twimg.com/amplify_video_thumb/2100067760818831360/img/y4v3B-qkYYS6N4rO.jpg",
+        "alt": "「STORM」ファッションMV風プロンプトの動画サムネイル"
+      },
+      "promptLanguage": "en",
+      "images": [],
+      "model": "Seedance 2.5",
+      "category": "映像・シネマティック",
+      "style": "real",
+      "tags": [
+        "ファッション",
+        "MV風",
+        "Seedance"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2026-09-16",
+      "likesAtCuration": 470,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 470 / 表示 38,123 / リポスト 60",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W38",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "楽曲の雰囲気と衣装を差し替えると別テイストのMV風映像が作れる。"
+    },
+    {
+      "id": "SEED-018",
+      "enabled": true,
+      "title": "ソウルのショッピングモールが舞台の復讐コメディ",
+      "summary": "ソウルのショッピングモールを舞台にした復讐コメディ動画プロンプトを公開した投稿。",
+      "author": {
+        "name": "Smiling Khan",
+        "handle": "AIwithkhan"
+      },
+      "parentPostUrl": "https://x.com/AIwithkhan/status/2111296614904336739",
+      "promptPostUrl": "https://x.com/AIwithkhan/status/2111296614904336739",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "video",
+      "videoThumbnail": {
+        "url": "https://pbs.twimg.com/amplify_video_thumb/2111296528606449664/img/4MnL7fb9u-H_JK4m.jpg",
+        "alt": "ソウルのショッピングモールが舞台の復讐コメディの動画サムネイル"
+      },
+      "promptLanguage": "en",
+      "images": [],
+      "model": "Seedance 2.5",
+      "category": "映像・シネマティック",
+      "style": "real",
+      "tags": [
+        "コメディ",
+        "ソウル",
+        "Seedance"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2026-10-17",
+      "likesAtCuration": 215,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 215 / 表示 15,452 / リポスト 11",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W42",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "舞台と登場人物を差し替えると別設定のコメディ映像が作れる。"
+    },
+    {
+      "id": "SEED-019",
+      "enabled": true,
+      "title": "韓国ゾンビサバイバル「THE LAST FLOOR」",
+      "summary": "韓国ゾンビサバイバル「THE LAST FLOOR」。30秒実写スリラーのプロンプト全文公開で30万表示を超えた投稿。",
+      "author": {
+        "name": "Tensor",
+        "handle": "QAiStudio"
+      },
+      "parentPostUrl": "https://x.com/QAiStudio/status/2117256134616818159",
+      "promptPostUrl": "https://x.com/QAiStudio/status/2117256134616818159",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "video",
+      "videoThumbnail": {
+        "url": "https://pbs.twimg.com/amplify_video_thumb/2117256108377337857/img/H-VlIOyPcB79cB9K.jpg",
+        "alt": "韓国ゾンビサバイバル「THE LAST FLOOR」の動画サムネイル"
+      },
+      "promptLanguage": "en",
+      "images": [],
+      "model": "Seedance 2.5（PixVerse）",
+      "category": "映像・シネマティック",
+      "style": "real",
+      "tags": [
+        "ゾンビ",
+        "スリラー",
+        "Seedance"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2026-11-02",
+      "likesAtCuration": 385,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 385 / 表示 305,680 / リポスト 38",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W45",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "舞台と生存者の設定を差し替えると別設定のサバイバル映像が作れる。"
+    },
+    {
+      "id": "SEED-020",
+      "enabled": true,
+      "title": "同一人物の顔を厳密に保持する冬ポートレート",
+      "summary": "同一人物の顔を厳密に保持する冬ファッション・ポートレートのプロンプトを公開した投稿。",
+      "author": {
+        "name": "Elvorya",
+        "handle": "Elvorya"
+      },
+      "parentPostUrl": "https://x.com/Elvorya/status/2121243826673349104",
+      "promptPostUrl": "https://x.com/Elvorya/status/2121243826673349104",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "en",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/media/HXAsAeGa8AAhek0.jpg?name=orig",
+          "alt": "同一人物の顔を厳密に保持する冬ポートレートの作例画像"
+        }
+      ],
+      "model": "Nano Banana Pro",
+      "category": "人物・ポートレート",
+      "style": "real",
+      "tags": [
+        "顔の一貫性",
+        "冬ファッション",
+        "ポートレート"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2026-11-13",
+      "likesAtCuration": 152,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 152 / 表示 8,087 / リポスト 22",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W46",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "季節と衣装を差し替えると別シーンのポートレートが作れる。"
+    },
+    {
+      "id": "SEED-021",
+      "enabled": true,
+      "title": "映画の飛行シーン用長文プロンプト",
+      "summary": "映画の飛行シーン用に設計された長文プロンプトを公開した投稿。表示数9万超と映像制作者層で大きく拡散した。",
+      "author": {
+        "name": "PJ Ace",
+        "handle": "PJaccetturo"
+      },
+      "parentPostUrl": "https://x.com/PJaccetturo/status/2121249238017568944",
+      "promptPostUrl": "https://x.com/PJaccetturo/status/2121249238017568944",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "video",
+      "videoThumbnail": {
+        "url": "https://pbs.twimg.com/amplify_video_thumb/2121147543015096320/img/llWb5MgGr_Dw3LPs.jpg",
+        "alt": "映画の飛行シーン用長文プロンプトの動画サムネイル"
+      },
+      "promptLanguage": "en",
+      "images": [],
+      "model": "不明（本文に記載なし）",
+      "category": "映像・シネマティック",
+      "style": "real",
+      "tags": [
+        "飛行シーン",
+        "長文プロンプト",
+        "シネマティック"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2026-11-13",
+      "likesAtCuration": 93,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 93 / 表示 92,620 / リポスト 5",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W46",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "舞台とカメラ指定を差し替えると別シーンの映像プロンプトが作れる。"
+    },
+    {
+      "id": "SEED-022",
+      "enabled": true,
+      "title": "参照画像と同一の人物像を100%リアルに再生成",
+      "summary": "参照画像と同一の人物像を100%リアルに再生成するプロンプトを公開した投稿。",
+      "author": {
+        "name": "Nouraya AI",
+        "handle": "xnouraya"
+      },
+      "parentPostUrl": "https://x.com/xnouraya/status/2122701137539399799",
+      "promptPostUrl": "https://x.com/xnouraya/status/2122701137539399799",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "en",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/media/HXVZbOPb0AADd0W.jpg?name=orig",
+          "alt": "参照画像と同一の人物像を100%リアルに再生成の作例画像"
+        }
+      ],
+      "model": "Nano Banana Pro",
+      "category": "人物・ポートレート",
+      "style": "real",
+      "tags": [
+        "顔の一貫性",
+        "リアル",
+        "ポートレート"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2026-11-17",
+      "likesAtCuration": 271,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 271 / 表示 8,940 / リポスト 7",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W47",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "参照画像とポーズを差し替えると別シーンの再生成が試せる。"
+    },
+    {
+      "id": "SEED-023",
+      "enabled": true,
+      "title": "参照画像の同一人物を別ポーズで描く",
+      "summary": "参照画像の同一人物を別ポーズで描くGPT Imageプロンプトを公開した投稿。",
+      "author": {
+        "name": "liana",
+        "handle": "Lianaalane"
+      },
+      "parentPostUrl": "https://x.com/Lianaalane/status/2123964230890348559",
+      "promptPostUrl": "https://x.com/Lianaalane/status/2123964230890348559",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "en",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/media/HXnWMCRaYAAbHkf.jpg?name=orig",
+          "alt": "参照画像の同一人物を別ポーズで描くの作例画像"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/HXnWM57a8AEQxSW.jpg?name=orig",
+          "alt": "参照画像の同一人物を別ポーズで描くの作例画像"
+        }
+      ],
+      "model": "GPT Image（ChatGPT）",
+      "category": "人物・ポートレート",
+      "style": "real",
+      "tags": [
+        "顔の一貫性",
+        "別ポーズ",
+        "GPT Image"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2026-11-21",
+      "likesAtCuration": 220,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 220 / 表示 10,381 / リポスト 27",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W47",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "参照画像とポーズを差し替えると別の場面が作れる。"
+    },
+    {
+      "id": "SEED-024",
+      "enabled": true,
+      "title": "写真をヴィンテージ編集写真ポスターに変える",
+      "summary": "参照写真をヴィンテージ編集写真ポスターに変えるプロンプトが1,200超のいいねを集めた投稿。",
+      "author": {
+        "name": "Taaruk",
+        "handle": "Taaruk_"
+      },
+      "parentPostUrl": "https://x.com/Taaruk_/status/2124358326486269975",
+      "promptPostUrl": "https://x.com/Taaruk_/status/2124358326486269975",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "en",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/media/HXs8od5aEAAG9dq.jpg?name=orig",
+          "alt": "写真をヴィンテージ編集写真ポスターに変えるの作例画像"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/HXs8od5bUAAWflI.jpg?name=orig",
+          "alt": "写真をヴィンテージ編集写真ポスターに変えるの作例画像"
+        }
+      ],
+      "model": "GPT Image 2",
+      "category": "デザイン・タイポ",
+      "style": "real",
+      "tags": [
+        "ヴィンテージ",
+        "ポスター",
+        "GPT Image"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2026-11-22",
+      "likesAtCuration": 1238,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 1,238 / 表示 64,695 / リポスト 107",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W47",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "写真と色調を差し替えると別テイストのポスターが作れる。"
+    },
+    {
+      "id": "SEED-025",
+      "enabled": true,
+      "title": "ピクサー風3Dアニメの家族コメディ動画",
+      "summary": "ピクサー風3Dアニメの家族コメディ動画プロンプトを全文公開した投稿。",
+      "author": {
+        "name": "Zarnab Ai",
+        "handle": "Zarnab_with_Ai"
+      },
+      "parentPostUrl": "https://x.com/Zarnab_with_Ai/status/2124820386949009778",
+      "promptPostUrl": "https://x.com/Zarnab_with_Ai/status/2124820386949009778",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "video",
+      "videoThumbnail": {
+        "url": "https://pbs.twimg.com/amplify_video_thumb/2124820006240485377/img/G0RC0uPqQGtjSvAE.jpg",
+        "alt": "ピクサー風3Dアニメの家族コメディ動画の動画サムネイル"
+      },
+      "promptLanguage": "en",
+      "images": [],
+      "model": "Seedance 2.5",
+      "category": "映像・シネマティック",
+      "style": "cg3d",
+      "tags": [
+        "3Dアニメ",
+        "家族コメディ",
+        "Seedance"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2026-11-23",
+      "likesAtCuration": 1068,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 1,068 / 表示 122,054 / リポスト 111",
       "weeklyPickup": false,
       "weeklyIssue": "2026-W48",
       "embedCheck": {
-        "lastCheckedAt": "2026-11-26",
-        "status": "ok",
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
         "removalRequested": false
-      }
+      },
+      "guidance": "家族構成と舞台を差し替えると別設定のコメディが作れる。"
+    },
+    {
+      "id": "SEED-026",
+      "enabled": true,
+      "title": "東京の商店街を疾走するワンテイク風チェイス",
+      "summary": "東京の商店街を疾走するワンテイク風チェイス動画プロンプトを公開した投稿。",
+      "author": {
+        "name": "Smiling Khan",
+        "handle": "AIwithkhan"
+      },
+      "parentPostUrl": "https://x.com/AIwithkhan/status/2124859693214662830",
+      "promptPostUrl": "https://x.com/AIwithkhan/status/2124859693214662830",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "video",
+      "videoThumbnail": {
+        "url": "https://pbs.twimg.com/amplify_video_thumb/2124859632514633728/img/Q_cDnIq10pzxbVfl.jpg",
+        "alt": "東京の商店街を疾走するワンテイク風チェイスの動画サムネイル"
+      },
+      "promptLanguage": "en",
+      "images": [],
+      "model": "Seedance 2.5（Dreamina）",
+      "category": "映像・シネマティック",
+      "style": "real",
+      "tags": [
+        "チェイス",
+        "ワンテイク風",
+        "東京"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2026-11-23",
+      "likesAtCuration": 278,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 278 / 表示 54,054 / リポスト 73",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W48",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "舞台と逃走者を差し替えると別設定のチェイス映像が作れる。"
+    },
+    {
+      "id": "SEED-027",
+      "enabled": true,
+      "title": "顔・服装の参照画像を使い分ける実写風シーン",
+      "summary": "顔・服装の参照画像を厳密に使い分ける長文の実写風シーン生成プロンプトを「自由に使って」と公開した日本語の投稿。",
+      "author": {
+        "name": "川越あい(ラブりんって呼んでෆ)",
+        "handle": "kawagoe_ai"
+      },
+      "parentPostUrl": "https://x.com/kawagoe_ai/status/2125012883276992564",
+      "promptPostUrl": "https://x.com/kawagoe_ai/status/2125012883276992564",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "ja",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/media/HX2PjYta8AEfBBs.jpg?name=orig",
+          "alt": "顔・服装の参照画像を使い分ける実写風シーンの作例画像"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/HX2PnKtawAAle8W.jpg?name=orig",
+          "alt": "顔・服装の参照画像を使い分ける実写風シーンの作例画像"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/HX2Pp3VboAAQ7Xh.jpg?name=orig",
+          "alt": "顔・服装の参照画像を使い分ける実写風シーンの作例画像"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/HX2PsTTbIAA4TXk.jpg?name=orig",
+          "alt": "顔・服装の参照画像を使い分ける実写風シーンの作例画像"
+        }
+      ],
+      "model": "Nano Banana 2 ほか（ChatGPT／Seedream等と4モデル比較）",
+      "category": "人物・ポートレート",
+      "style": "anime",
+      "tags": [
+        "顔の一貫性",
+        "日本語プロンプト",
+        "実写風"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2026-11-23",
+      "likesAtCuration": 237,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 237 / 表示 6,122 / リポスト 13",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W48",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "参照画像とシーンを差し替えると別の実写風場面が作れる。"
+    },
+    {
+      "id": "SEED-028",
+      "enabled": true,
+      "title": "40秒のシネマティック3Dアニメ短編",
+      "summary": "40秒のシネマティック3Dアニメ短編プロンプトを全文公開し1,700超のいいねを集めた投稿。",
+      "author": {
+        "name": "Zarnab Ai",
+        "handle": "Zarnab_with_Ai"
+      },
+      "parentPostUrl": "https://x.com/Zarnab_with_Ai/status/2125054727545385263",
+      "promptPostUrl": "https://x.com/Zarnab_with_Ai/status/2125054727545385263",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "video",
+      "videoThumbnail": {
+        "url": "https://pbs.twimg.com/amplify_video_thumb/2125054462930944000/img/vmV6clDfbGRKS1im.jpg",
+        "alt": "40秒のシネマティック3Dアニメ短編の動画サムネイル"
+      },
+      "promptLanguage": "en",
+      "images": [],
+      "model": "Seedance 2.5",
+      "category": "映像・シネマティック",
+      "style": "cg3d",
+      "tags": [
+        "3Dアニメ",
+        "短編",
+        "シネマティック"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2026-11-24",
+      "likesAtCuration": 1710,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 1,710 / 表示 279,737 / リポスト 113",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W48",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "物語と舞台を差し替えると別設定の短編が作れる。"
+    },
+    {
+      "id": "SEED-029",
+      "enabled": true,
+      "title": "都市ファンタジーのバトルアクション動画",
+      "summary": "都市ファンタジーのバトルアクション動画プロンプトを公開した投稿。",
+      "author": {
+        "name": "Lavinia",
+        "handle": "laviniavelle"
+      },
+      "parentPostUrl": "https://x.com/laviniavelle/status/2125096392628560268",
+      "promptPostUrl": "https://x.com/laviniavelle/status/2125096392628560268",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "video",
+      "videoThumbnail": {
+        "url": "https://pbs.twimg.com/amplify_video_thumb/2125096250320003072/img/FZtPlMLWfOsx4reg.jpg",
+        "alt": "都市ファンタジーのバトルアクション動画の動画サムネイル"
+      },
+      "promptLanguage": "en",
+      "images": [],
+      "model": "Seedance 2.5",
+      "category": "映像・シネマティック",
+      "style": "real",
+      "tags": [
+        "バトルアクション",
+        "都市ファンタジー",
+        "Seedance"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2026-11-24",
+      "likesAtCuration": 273,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 273 / 表示 21,370 / リポスト 69",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W48",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "舞台と能力を差し替えると別設定のバトル映像が作れる。"
+    },
+    {
+      "id": "SEED-031",
+      "enabled": true,
+      "title": "黒背景×金のミニマリズム壁紙",
+      "summary": "黒背景×金のミニマリズム壁紙を作るプロンプトを公開した投稿。",
+      "author": {
+        "name": "Viki",
+        "handle": "churvikv"
+      },
+      "parentPostUrl": "https://x.com/churvikv/status/2125609286701052361",
+      "promptPostUrl": "https://x.com/churvikv/status/2125609286701052361",
+      "promptLocationType": "body",
+      "promptLocationNote": "本文内にプロンプト全文あり。",
+      "mediaType": "image",
+      "videoThumbnail": null,
+      "promptLanguage": "en",
+      "images": [
+        {
+          "url": "https://pbs.twimg.com/tweet_video_thumb/HX-uNaWWcAA7R0a.jpg",
+          "alt": "黒背景×金のミニマリズム壁紙の作例画像"
+        }
+      ],
+      "model": "GPT Image 2.6（ImagineArt）",
+      "category": "デザイン・タイポ",
+      "style": "illust",
+      "tags": [
+        "壁紙",
+        "ミニマリズム",
+        "金"
+      ],
+      "publishedAt": "2026-11-27",
+      "originalPostedAt": "2026-11-25",
+      "likesAtCuration": 132,
+      "reactionNote": "収集時点メモ（2026-11-27確認）：いいね 132 / 表示 3,045 / リポスト 20",
+      "weeklyPickup": false,
+      "weeklyIssue": "2026-W48",
+      "embedCheck": {
+        "lastCheckedAt": "2026-11-27",
+        "status": "unchecked",
+        "removalRequested": false
+      },
+      "guidance": "色とモチーフを差し替えると別デザインの壁紙が作れる。"
     }
   ]
 }
