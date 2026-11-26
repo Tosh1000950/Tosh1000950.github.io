@@ -10,6 +10,12 @@
 
 import { getSafeHttpsUrl } from '../url-utils.js';
 
+function getSafeEmail(raw) {
+  if (typeof raw !== 'string') return null;
+  const trimmed = raw.trim();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed) ? trimmed : null;
+}
+
 /**
  * Helper: mount a static page with a simple, consistent in-page JA / EN toggle.
  */
@@ -134,7 +140,7 @@ export function renderAboutView({ container, siteConfig, initialLang = 'ja' }) {
       const pillars = [
         [
           '利用者のWin',
-          '大きな画像・動画サムネイルから直感的に選び、日本語タイトル・要約・対応モデル・プロンプト言語・場所案内で迷わず元ポストにたどり着けます。',
+          '大きな画像・動画サムネイルから直感的に選び、日本語タイトル・要約・作風・対応モデル・プロンプト言語・場所案内で迷わず元ポストにたどり着けます。',
         ],
         [
           'プロンプト作者のWin',
@@ -223,7 +229,7 @@ export function renderAboutView({ container, siteConfig, initialLang = 'ja' }) {
         '動画ポストは一覧ではサムネイル画像（pbs.twimg.com 直リンク）＋▶バッジで表示し、再生は詳細画面のX公式埋め込みの中だけで行います。',
         '日本語だけでなく英語・中国語・韓国語などの海外バズプロンプトも一次ポストを確認のうえ掲載対象とし、一覧の「プロンプト言語」で絞り込めます。',
         'ツリー（自己リプライ）にプロンプトが記載されている場合は、詳細画面で「親ポスト」と「プロンプト記載リプライ」の両方の公式埋め込みを並べて案内します。',
-        'プロンプト本文を保持しない設計のため、プロンプト本文の全文検索は仕様上対象外です。代わりに運営者が書く日本語タイトル・固定カテゴリ・対応モデル・プロンプト言語・タグ・1行要約で探せるようにしています。',
+        'プロンプト本文を保持しない設計のため、プロンプト本文の全文検索は仕様上対象外です。代わりに運営者が書く日本語タイトル・固定カテゴリ・作風・対応モデル・プロンプト言語・タグ・1行要約での絞り込みや、元の投稿日・収集時点のいいね数・掲載日での並べ替えに対応しています。',
         '直リンク画像は元ポスト削除後もしばらく残る場合があるため、公式埋め込みが表示できなくなった掲載は定期チェックで検知し、一覧から自動的に下げる運用を徹底します。',
       ];
 
@@ -294,7 +300,7 @@ export function renderAboutView({ container, siteConfig, initialLang = 'ja' }) {
         ],
         [
           'For Visitors',
-          'Visual discovery with short Japanese editorial titles, summaries, model names, prompt language tags, and clear notes on where the prompt lives in your thread.',
+          'Visual discovery with short Japanese editorial titles, summaries, visual styles, model names, prompt language tags, and clear notes on where the prompt lives in your thread.',
         ],
         [
           'For the Curator',
@@ -396,6 +402,9 @@ export function renderAboutView({ container, siteConfig, initialLang = 'ja' }) {
 
 export function renderSubmitView({ container, siteConfig, initialLang = 'ja' }) {
   const subUrl = getSafeHttpsUrl(siteConfig?.contact?.submissionUrl);
+  const subEmail =
+    getSafeEmail(siteConfig?.contact?.submissionEmail) ||
+    getSafeEmail(siteConfig?.contact?.removalEmail);
 
   mountStaticPage({
     container,
@@ -420,7 +429,7 @@ export function renderSubmitView({ container, siteConfig, initialLang = 'ja' }) 
       [
         '対象となるXの親ポストURL（画像または動画が掲載されているポスト）',
         'プロンプトが記載されている場所（本文内／リプライのURL／引用先／画像のALTなど）',
-        '使用した生成モデル名（例：Midjourney v7、FLUX、GPT Image、Kling、Sora、Veo など）とプロンプトの言語（日本語／英語／中国語／韓国語など）',
+        '使用した生成モデル名（例：Midjourney v7、FLUX、GPT Image、Kling、Sora、Veo など）、作風（実写系／アニメ系／イラスト系／3D・CG系／ドット・ゲーム系／その他）、プロンプトの言語（日本語／英語／中国語／韓国語など）',
         'アピールしたいポイントや応用メモ（任意）',
       ].forEach((txt) => {
         const li = document.createElement('li');
@@ -439,31 +448,79 @@ export function renderSubmitView({ container, siteConfig, initialLang = 'ja' }) 
       const contactCard = document.createElement('section');
       contactCard.className = 'content-card';
       const h2c = document.createElement('h2');
-      h2c.textContent = '受付窓口';
+      h2c.textContent = '受付窓口（Webフォーム主窓口・メール補助）';
 
-      if (subUrl) {
-        const p = document.createElement('p');
-        p.textContent = '以下の受付窓口より自薦・掲載依頼をお送りいただけます。';
-        const link = document.createElement('a');
-        link.href = subUrl;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.className = 'btn btn--accent';
-        link.textContent = '自薦・掲載依頼を送る ↗';
-        contactCard.append(h2c, p, link);
-      } else {
+      const channelIntro = document.createElement('p');
+      channelIntro.textContent =
+        '自薦・掲載依頼は、必須項目を漏れなく受け取り週次便でスムーズに確認できる専用Webフォーム（Googleフォーム／項目ラベル日英併記）を主窓口としています。フォームが利用できない場合の補助連絡先としてメールも併記します。';
+
+      const channelList = document.createElement('ul');
+      channelList.className = 'policy-list';
+      [
+        [
+          '主窓口：専用Webフォーム（Googleフォーム）：',
+          '対象ポストURLやプロンプトの場所など必要事項を入力欄に沿って送信できます（項目ラベルに英語も併記）。',
+        ],
+        [
+          '補助連絡先：メール：',
+          'Webフォームを開けない場合などの補助窓口としてご利用いただけます。',
+        ],
+      ].forEach(([bold, text]) => {
+        const li = document.createElement('li');
+        const strong = document.createElement('strong');
+        strong.textContent = bold;
+        li.append(strong, document.createTextNode(text));
+        channelList.appendChild(li);
+      });
+
+      contactCard.append(h2c, channelIntro, channelList);
+
+      if (subUrl || subEmail) {
+        const actions = document.createElement('div');
+        actions.className = 'manifesto-actions';
+        actions.style.marginTop = '1rem';
+
+        if (subUrl) {
+          const formLink = document.createElement('a');
+          formLink.href = subUrl;
+          formLink.target = '_blank';
+          formLink.rel = 'noopener noreferrer';
+          formLink.className = 'btn btn--accent';
+          formLink.textContent = '専用Webフォーム（Googleフォーム）を開く ↗';
+          actions.appendChild(formLink);
+        }
+
+        if (subEmail) {
+          const subject = encodeURIComponent('【自薦・掲載依頼 / Prompt Submission】');
+          const bodyText = encodeURIComponent(
+            '1. 対象ポストURL / Parent Post URL：\n2. プロンプトの場所 / Prompt Location：\n3. 対応モデル・作風・言語 / Model, Style & Language：\n4. 補足メモ（任意）/ Optional Note：\n'
+          );
+          const mailLink = document.createElement('a');
+          mailLink.href = `mailto:${subEmail}?subject=${subject}&body=${bodyText}`;
+          mailLink.className = 'btn btn--outline';
+          mailLink.textContent = `補助連絡先：メールで送る（${subEmail}）`;
+          actions.appendChild(mailLink);
+        }
+
+        contactCard.appendChild(actions);
+      }
+
+      if (!subUrl) {
         const callout = document.createElement('div');
         callout.className = 'placeholder-callout';
+        callout.style.marginTop = '1rem';
         const strong = document.createElement('strong');
-        strong.textContent = '窓口設定待ち（仮置き）：';
+        strong.textContent = subEmail
+          ? 'GoogleフォームURL設定待ち（仮置き）：'
+          : 'GoogleフォームURL・補助メール設定待ち（仮置き）：';
         callout.append(
           strong,
           document.createTextNode(
             siteConfig?.contact?.submissionNote ||
-              '自薦の受付方法（Xリプライ／専用フォーム／GitHub等）は運営者が最終決定のうえ、ここに設定します。'
+              '主窓口となるGoogleフォームは公開準備時に運営者のGoogleアカウントで作成し、data/posts.json の siteConfig.contact に設定する予定です（設定後、ここにフォームへの直接リンクが表示されます）。'
           )
         );
-        contactCard.append(h2c, callout);
+        contactCard.appendChild(callout);
       }
 
       shell.appendChild(contactCard);
@@ -489,7 +546,7 @@ export function renderSubmitView({ container, siteConfig, initialLang = 'ja' }) 
       [
         'Target X parent post URL (public image or video post)',
         'Where the prompt is posted (post body, self-reply URL, quote post, image ALT, etc.)',
-        'Generation model used (e.g., Midjourney, FLUX, GPT Image, Kling, Sora, Veo) and prompt language',
+        'Generation model used (e.g., Midjourney, FLUX, GPT Image, Kling, Sora, Veo), visual style (photorealistic / anime / illustration / 3D & CG / pixel & game / other), and prompt language',
         'Optional highlight or customization tip (we will write a short Japanese title & summary for Japanese readers)',
       ].forEach((txt) => {
         const li = document.createElement('li');
@@ -500,7 +557,7 @@ export function renderSubmitView({ container, siteConfig, initialLang = 'ja' }) 
       const note = document.createElement('p');
       note.style.marginTop = '0.9rem';
       note.textContent =
-        'Note: Submissions are reviewed manually to confirm that the prompt is publicly accessible on X, matches the media, and is suitable for a general all-ages audience.';
+        'Note: Submissions are reviewed manually in our weekly batch to confirm that the prompt is publicly accessible on X, matches the media, and is suitable for a general all-ages audience.';
 
       infoCard.append(h2, list, note);
       shell.appendChild(infoCard);
@@ -508,30 +565,78 @@ export function renderSubmitView({ container, siteConfig, initialLang = 'ja' }) 
       const contactCard = document.createElement('section');
       contactCard.className = 'content-card';
       const h2c = document.createElement('h2');
-      h2c.textContent = 'Submission Channel';
+      h2c.textContent = 'Submission Channel (Web Form Primary, Email Secondary)';
 
-      if (subUrl) {
-        const p = document.createElement('p');
-        p.textContent = 'Send your post URL and details through our submission channel below.';
-        const link = document.createElement('a');
-        link.href = subUrl;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.className = 'btn btn--accent';
-        link.textContent = 'Open Submission Channel ↗';
-        contactCard.append(h2c, p, link);
-      } else {
+      const channelIntro = document.createElement('p');
+      channelIntro.textContent =
+        'Our primary intake channel is a dedicated Web Form (Google Forms, with bilingual Japanese/English field labels) so all required details are captured cleanly for weekly curation. Email is provided as a secondary fallback contact.';
+
+      const channelList = document.createElement('ul');
+      channelList.className = 'policy-list';
+      [
+        [
+          'Primary intake — Web Form (Google Forms): ',
+          'Recommended for fast, structured submissions with short English labels alongside Japanese.',
+        ],
+        [
+          'Secondary contact — Email: ',
+          'Available as a fallback if you are unable to open or submit the web form.',
+        ],
+      ].forEach(([bold, text]) => {
+        const li = document.createElement('li');
+        const strong = document.createElement('strong');
+        strong.textContent = bold;
+        li.append(strong, document.createTextNode(text));
+        channelList.appendChild(li);
+      });
+
+      contactCard.append(h2c, channelIntro, channelList);
+
+      if (subUrl || subEmail) {
+        const actions = document.createElement('div');
+        actions.className = 'manifesto-actions';
+        actions.style.marginTop = '1rem';
+
+        if (subUrl) {
+          const formLink = document.createElement('a');
+          formLink.href = subUrl;
+          formLink.target = '_blank';
+          formLink.rel = 'noopener noreferrer';
+          formLink.className = 'btn btn--accent';
+          formLink.textContent = 'Open Submission Form (Google Forms) ↗';
+          actions.appendChild(formLink);
+        }
+
+        if (subEmail) {
+          const subject = encodeURIComponent('[Prompt Submission] X Prompt Gallery');
+          const bodyText = encodeURIComponent(
+            '1. Parent Post URL: \n2. Prompt Location: \n3. Model, Style & Prompt Language: \n4. Optional Note: \n'
+          );
+          const mailLink = document.createElement('a');
+          mailLink.href = `mailto:${subEmail}?subject=${subject}&body=${bodyText}`;
+          mailLink.className = 'btn btn--outline';
+          mailLink.textContent = `Secondary Contact: Email (${subEmail})`;
+          actions.appendChild(mailLink);
+        }
+
+        contactCard.appendChild(actions);
+      }
+
+      if (!subUrl) {
         const callout = document.createElement('div');
         callout.className = 'placeholder-callout';
+        callout.style.marginTop = '1rem';
         const strong = document.createElement('strong');
-        strong.textContent = 'Channel pending setup (placeholder): ';
+        strong.textContent = subEmail
+          ? 'Google Form URL pending setup (placeholder): '
+          : 'Google Form URL & secondary email pending setup (placeholder): ';
         callout.append(
           strong,
           document.createTextNode(
-            'The operator is finalizing the public submission channel (X reply, form, or GitHub). Once configured in data/posts.json, the direct link will appear here.'
+            'The operator will create the bilingual Google Form during launch preparation and configure its URL (plus secondary email) in data/posts.json (siteConfig.contact). Direct links will appear here once configured.'
           )
         );
-        contactCard.append(h2c, callout);
+        contactCard.appendChild(callout);
       }
 
       shell.appendChild(contactCard);
@@ -546,11 +651,7 @@ export function renderSubmitView({ container, siteConfig, initialLang = 'ja' }) 
 export function renderRemovalView({ container, siteConfig, prefillPostUrl, initialLang = 'ja' }) {
   const operatorName = siteConfig?.operatorName || 'Tosh1';
   const removalUrl = getSafeHttpsUrl(siteConfig?.contact?.removalUrl);
-  const removalEmail =
-    typeof siteConfig?.contact?.removalEmail === 'string' &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(siteConfig.contact.removalEmail.trim())
-      ? siteConfig.contact.removalEmail.trim()
-      : null;
+  const removalEmail = getSafeEmail(siteConfig?.contact?.removalEmail);
 
   mountStaticPage({
     container,
@@ -588,7 +689,7 @@ export function renderRemovalView({ container, siteConfig, prefillPostUrl, initi
       body1.append(
         strong1,
         document.createElement('br'),
-        document.createTextNode('下の受付窓口から対象ポストURLをお送りいただくと、確認コード（例：'),
+        document.createTextNode('下の専用Webフォーム（Googleフォーム）または補助連絡先メールから対象ポストURLをお送りいただくと、確認コード（例：'),
         createInlineCode('xpg-del-XXXX'),
         document.createTextNode('）を発行してお伝えします。')
       );
@@ -729,15 +830,41 @@ export function renderRemovalView({ container, siteConfig, prefillPostUrl, initi
 
       shell.appendChild(reqCard);
 
-      // 4. Contact Destination
+      // 4. Contact Destination (Primary: Google Forms, Secondary: Email)
       const contactCard = document.createElement('section');
       contactCard.className = 'content-card';
       const h2c = document.createElement('h2');
-      h2c.textContent = '依頼の送信先';
+      h2c.textContent = '依頼の送信先（Webフォーム主窓口・メール補助）';
+
+      const channelIntro = document.createElement('p');
+      channelIntro.textContent =
+        '必須3項目を漏れなく受け取り確認の往復を減らすため、専用Webフォーム（Googleフォーム／項目ラベル日英併記）を主窓口としています。フォームが利用できない場合の補助連絡先としてメールも併記します。';
+
+      const channelList = document.createElement('ul');
+      channelList.className = 'policy-list';
+      [
+        [
+          '主窓口：専用Webフォーム（Googleフォーム）：',
+          '対象ポストURL・希望する対応・確認コードの掲載先をフォームに沿って送信できます（項目ラベルに英語も併記）。',
+        ],
+        [
+          '補助連絡先：メール：',
+          'Webフォームが開けない場合などの補助窓口です（※メール自称のみでは本人確認とせず、確認コード方式の照合を行います）。',
+        ],
+      ].forEach(([bold, text]) => {
+        const li = document.createElement('li');
+        const strong = document.createElement('strong');
+        strong.textContent = bold;
+        li.append(strong, document.createTextNode(text));
+        channelList.appendChild(li);
+      });
+
+      contactCard.append(h2c, channelIntro, channelList);
 
       if (removalUrl || removalEmail) {
         const actions = document.createElement('div');
         actions.className = 'manifesto-actions';
+        actions.style.marginTop = '1rem';
 
         if (removalUrl) {
           const formLink = document.createElement('a');
@@ -745,7 +872,7 @@ export function renderRemovalView({ container, siteConfig, prefillPostUrl, initi
           formLink.target = '_blank';
           formLink.rel = 'noopener noreferrer';
           formLink.className = 'btn btn--primary';
-          formLink.textContent = '削除・修正依頼窓口を開く ↗';
+          formLink.textContent = '削除・修正依頼フォーム（Googleフォーム）を開く ↗';
           actions.appendChild(formLink);
         }
 
@@ -757,24 +884,29 @@ export function renderRemovalView({ container, siteConfig, prefillPostUrl, initi
           const mailLink = document.createElement('a');
           mailLink.href = `mailto:${removalEmail}?subject=${subject}&body=${bodyText}`;
           mailLink.className = 'btn btn--outline';
-          mailLink.textContent = `メールで依頼する（${removalEmail}）`;
+          mailLink.textContent = `補助連絡先：メールで依頼する（${removalEmail}）`;
           actions.appendChild(mailLink);
         }
 
-        contactCard.append(h2c, actions);
-      } else {
+        contactCard.appendChild(actions);
+      }
+
+      if (!removalUrl) {
         const callout = document.createElement('div');
         callout.className = 'placeholder-callout';
+        callout.style.marginTop = '1rem';
         const strong = document.createElement('strong');
-        strong.textContent = '連絡先設定待ち（仮置き）：';
+        strong.textContent = removalEmail
+          ? 'GoogleフォームURL設定待ち（仮置き）：'
+          : 'GoogleフォームURL・補助メール設定待ち（仮置き）：';
         callout.append(
           strong,
           document.createTextNode(
             siteConfig?.contact?.removalNote ||
-              '確認コード方式の受付窓口（専用フォームURL／メールアドレス／Xアカウント等）は運営者が決定後、data/posts.json に設定します。'
+              '主窓口となるGoogleフォームは公開準備時に運営者のGoogleアカウントで作成し、data/posts.json の siteConfig.contact に設定する予定です（設定後、ここにフォームへの直接リンクが表示されます）。'
           )
         );
-        contactCard.append(h2c, callout);
+        contactCard.appendChild(callout);
       }
 
       shell.appendChild(contactCard);
@@ -812,7 +944,7 @@ export function renderRemovalView({ container, siteConfig, prefillPostUrl, initi
       body1.append(
         strong1,
         document.createElement('br'),
-        document.createTextNode('Send us the target X post URL via the contact channel below. We will issue a short verification code (e.g., '),
+        document.createTextNode('Send us the target X post URL via our dedicated Web Form (Google Forms) or secondary email contact below. We will issue a short verification code (e.g., '),
         createInlineCode('xpg-del-XXXX'),
         document.createTextNode(').')
       );
@@ -951,15 +1083,41 @@ export function renderRemovalView({ container, siteConfig, prefillPostUrl, initi
 
       shell.appendChild(reqCard);
 
-      // 4. Contact Destination
+      // 4. Contact Destination (Primary: Google Forms, Secondary: Email)
       const contactCard = document.createElement('section');
       contactCard.className = 'content-card';
       const h2c = document.createElement('h2');
-      h2c.textContent = 'Contact Channel';
+      h2c.textContent = 'Contact Channel (Web Form Primary, Email Secondary)';
+
+      const channelIntro = document.createElement('p');
+      channelIntro.textContent =
+        'Our primary intake channel is a dedicated Web Form (Google Forms, with bilingual Japanese/English field labels) so the 3 required inputs are captured cleanly for batch processing. Email is provided as a secondary fallback contact.';
+
+      const channelList = document.createElement('ul');
+      channelList.className = 'policy-list';
+      [
+        [
+          'Primary intake — Web Form (Google Forms): ',
+          'Recommended for fast, structured requests with short English labels alongside Japanese.',
+        ],
+        [
+          'Secondary contact — Email: ',
+          'Available as a fallback if you cannot access the web form (note: email alone does not verify ownership; verification-code confirmation is still required).',
+        ],
+      ].forEach(([bold, text]) => {
+        const li = document.createElement('li');
+        const strong = document.createElement('strong');
+        strong.textContent = bold;
+        li.append(strong, document.createTextNode(text));
+        channelList.appendChild(li);
+      });
+
+      contactCard.append(h2c, channelIntro, channelList);
 
       if (removalUrl || removalEmail) {
         const actions = document.createElement('div');
         actions.className = 'manifesto-actions';
+        actions.style.marginTop = '1rem';
 
         if (removalUrl) {
           const formLink = document.createElement('a');
@@ -967,7 +1125,7 @@ export function renderRemovalView({ container, siteConfig, prefillPostUrl, initi
           formLink.target = '_blank';
           formLink.rel = 'noopener noreferrer';
           formLink.className = 'btn btn--primary';
-          formLink.textContent = 'Open Removal Request Channel ↗';
+          formLink.textContent = 'Open Removal Request Form (Google Forms) ↗';
           actions.appendChild(formLink);
         }
 
@@ -979,23 +1137,28 @@ export function renderRemovalView({ container, siteConfig, prefillPostUrl, initi
           const mailLink = document.createElement('a');
           mailLink.href = `mailto:${removalEmail}?subject=${subject}&body=${bodyText}`;
           mailLink.className = 'btn btn--outline';
-          mailLink.textContent = `Request via Email (${removalEmail})`;
+          mailLink.textContent = `Secondary Contact: Email (${removalEmail})`;
           actions.appendChild(mailLink);
         }
 
-        contactCard.append(h2c, actions);
-      } else {
+        contactCard.appendChild(actions);
+      }
+
+      if (!removalUrl) {
         const callout = document.createElement('div');
         callout.className = 'placeholder-callout';
+        callout.style.marginTop = '1rem';
         const strong = document.createElement('strong');
-        strong.textContent = 'Contact channel pending setup (placeholder): ';
+        strong.textContent = removalEmail
+          ? 'Google Form URL pending setup (placeholder): '
+          : 'Google Form URL & secondary email pending setup (placeholder): ';
         callout.append(
           strong,
           document.createTextNode(
-            'The operator is finalizing the verification-code intake channel (form URL, email, or X account). Once configured in data/posts.json, direct submission links will appear here.'
+            'The operator will create the bilingual Google Form during launch preparation and configure its URL (plus secondary email) in data/posts.json (siteConfig.contact). Direct links will appear here once configured.'
           )
         );
-        contactCard.append(h2c, callout);
+        contactCard.appendChild(callout);
       }
 
       shell.appendChild(contactCard);
