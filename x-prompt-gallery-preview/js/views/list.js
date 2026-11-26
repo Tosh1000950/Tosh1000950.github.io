@@ -3,38 +3,101 @@
  *
  * Strictly adheres to SPEC §4.2:
  * - Displays large direct-linked X images (pbs.twimg.com) using `name=small/medium`.
- * - Overlays site's own UI (Japanese title, tags, author @handle, model, category) on cards.
+ * - Overlays site's own UI (Japanese title, tags, author @handle, model, category, style, language, likes snapshot) on cards.
  * - NEVER places official X embeds in the list view.
- * - Defaults to newest first (publishedAt descending).
+ * - Defaults to original post date newest first (originalPostedAt descending) per SPEC §5.1.
  */
 
 import {
+  POST_STYLES,
   PROMPT_LANGUAGES,
   buildCardImageSrcSet,
   buildPbsImageUrl,
   formatDateJa,
+  formatLikesExactJa,
+  formatLikesShortJa,
   getPostCardThumbnail,
   getPromptLanguageLabel,
+  getStyleLabel,
   hasSeparatePromptPost,
+  isValidLikesCount,
   isVideoPost,
   normalizeHandle,
   normalizeImageItem,
 } from '../url-utils.js';
 
+export const SORT_OPTIONS = Object.freeze([
+  { value: 'original-desc', label: '元の投稿日（新しい順）' },
+  { value: 'original-asc', label: '元の投稿日（古い順）' },
+  { value: 'likes-desc', label: 'いいね数順（収集時点）' },
+  { value: 'published-desc', label: '掲載日（新しい順）' },
+]);
+
+function normalizeSortKey(sortBy) {
+  switch (sortBy) {
+    case 'original-asc':
+      return 'original-asc';
+    case 'likes-desc':
+    case 'likes':
+      return 'likes-desc';
+    case 'published-desc':
+    case 'published':
+      return 'published-desc';
+    case 'original-desc':
+    case 'original':
+    default:
+      return 'original-desc';
+  }
+}
+
+function compareDatesDesc(a, b) {
+  const sa = typeof a === 'string' ? a.trim() : '';
+  const sb = typeof b === 'string' ? b.trim() : '';
+  if (sa === sb) return 0;
+  if (!sa) return 1;
+  if (!sb) return -1;
+  return sb.localeCompare(sa);
+}
+
+function compareDatesAsc(a, b) {
+  const sa = typeof a === 'string' ? a.trim() : '';
+  const sb = typeof b === 'string' ? b.trim() : '';
+  if (sa === sb) return 0;
+  if (!sa) return 1;
+  if (!sb) return -1;
+  return sa.localeCompare(sb);
+}
+
+function compareLikesDesc(a, b) {
+  const hasA = isValidLikesCount(a);
+  const hasB = isValidLikesCount(b);
+  if (hasA && hasB) return b - a;
+  if (hasA) return -1;
+  if (hasB) return 1;
+  return 0;
+}
+
 /**
  * Create a single direct-linked image / video-thumbnail card element
  * (reused in List, Weekly, and Author views).
  * @param {object} post
+ * @param {{ sortBy?: string }} [options]
  * @returns {HTMLElement}
  */
-export function createPromptCard(post) {
+export function createPromptCard(post, { sortBy = 'original-desc' } = {}) {
   const isVideo = isVideoPost(post);
   const article = document.createElement('article');
   article.className = isVideo ? 'prompt-card prompt-card--video' : 'prompt-card';
   article.dataset.postId = post.id;
   article.dataset.mediaType = isVideo ? 'video' : 'image';
+  if (post.style) {
+    article.dataset.style = post.style;
+  }
   if (post.promptLanguage) {
     article.dataset.promptLanguage = post.promptLanguage;
+  }
+  if (isValidLikesCount(post.likesAtCuration)) {
+    article.dataset.likesAtCuration = String(post.likesAtCuration);
   }
 
   const images = (Array.isArray(post.images) ? post.images : [])
@@ -120,6 +183,13 @@ export function createPromptCard(post) {
     rightBadges.appendChild(videoBadge);
   }
 
+  if (post.style) {
+    const styleBadge = document.createElement('span');
+    styleBadge.className = 'card-badge card-badge--style';
+    styleBadge.textContent = getStyleLabel(post.style);
+    rightBadges.appendChild(styleBadge);
+  }
+
   if (post.promptLanguage) {
     const langBadge = document.createElement('span');
     langBadge.className = 'card-badge card-badge--lang';
@@ -164,11 +234,37 @@ export function createPromptCard(post) {
     metaRow.appendChild(authorLink);
   }
 
-  if (post.publishedAt) {
+  const metaStats = document.createElement('div');
+  metaStats.className = 'card-meta-stats';
+
+  const likesShort = formatLikesShortJa(post.likesAtCuration);
+  if (likesShort !== null) {
+    const likesExact = formatLikesExactJa(post.likesAtCuration);
+    const likesEl = document.createElement('span');
+    likesEl.className = 'card-likes';
+    likesEl.title = `収集時点のいいね数: ${likesExact}`;
+    likesEl.setAttribute('aria-label', `収集時点のいいね数 ${likesExact}`);
+    likesEl.textContent = `♥ ${likesShort}（収集時点）`;
+    metaStats.appendChild(likesEl);
+  }
+
+  const normalizedSort = normalizeSortKey(sortBy);
+  const dateValue =
+    normalizedSort === 'published-desc'
+      ? post.publishedAt || post.originalPostedAt
+      : post.originalPostedAt || post.publishedAt;
+  if (dateValue) {
     const dateEl = document.createElement('span');
     dateEl.className = 'card-date';
-    dateEl.textContent = formatDateJa(post.publishedAt);
-    metaRow.appendChild(dateEl);
+    dateEl.textContent =
+      normalizedSort === 'published-desc'
+        ? `掲載 ${formatDateJa(dateValue)}`
+        : `投稿 ${formatDateJa(dateValue)}`;
+    metaStats.appendChild(dateEl);
+  }
+
+  if (metaStats.childElementCount > 0) {
+    metaRow.appendChild(metaStats);
   }
 
   bottomOverlay.append(titleEl, metaRow);
@@ -213,22 +309,46 @@ function createCardImageFallback(isVideo = false) {
 }
 
 /**
- * Sort posts according to selected sort order (default: newest publishedAt first).
+ * Sort posts according to selected sort order (default: originalPostedAt newest first per SPEC §5.1).
  * @param {Array<object>} posts
- * @param {'published' | 'original'} sortBy
+ * @param {'original-desc' | 'original-asc' | 'likes-desc' | 'published-desc' | 'original' | 'published'} [sortBy='original-desc']
  * @returns {Array<object>}
  */
-export function sortPosts(posts, sortBy = 'published') {
+export function sortPosts(posts, sortBy = 'original-desc') {
+  const key = normalizeSortKey(sortBy);
   return [...posts].sort((a, b) => {
-    const primaryA = sortBy === 'original' ? (a.originalPostedAt || '') : (a.publishedAt || '');
-    const primaryB = sortBy === 'original' ? (b.originalPostedAt || '') : (b.publishedAt || '');
-    if (primaryA !== primaryB) return primaryB.localeCompare(primaryA);
+    if (key === 'original-asc') {
+      return (
+        compareDatesAsc(a.originalPostedAt, b.originalPostedAt) ||
+        compareDatesAsc(a.publishedAt, b.publishedAt) ||
+        String(a.id || '').localeCompare(String(b.id || ''))
+      );
+    }
 
-    const secondaryA = sortBy === 'original' ? (a.publishedAt || '') : (a.originalPostedAt || '');
-    const secondaryB = sortBy === 'original' ? (b.publishedAt || '') : (b.originalPostedAt || '');
-    if (secondaryA !== secondaryB) return secondaryB.localeCompare(secondaryA);
+    if (key === 'likes-desc') {
+      return (
+        compareLikesDesc(a.likesAtCuration, b.likesAtCuration) ||
+        compareDatesDesc(a.originalPostedAt, b.originalPostedAt) ||
+        compareDatesDesc(a.publishedAt, b.publishedAt) ||
+        String(b.id || '').localeCompare(String(a.id || ''))
+      );
+    }
 
-    return String(b.id || '').localeCompare(String(a.id || ''));
+    if (key === 'published-desc') {
+      return (
+        compareDatesDesc(a.publishedAt, b.publishedAt) ||
+        compareDatesDesc(a.originalPostedAt, b.originalPostedAt) ||
+        String(b.id || '').localeCompare(String(a.id || ''))
+      );
+    }
+
+    // Default: original-desc (original post date newest first)
+    return (
+      compareDatesDesc(a.originalPostedAt, b.originalPostedAt) ||
+      compareDatesDesc(a.publishedAt, b.publishedAt) ||
+      compareLikesDesc(a.likesAtCuration, b.likesAtCuration) ||
+      String(b.id || '').localeCompare(String(a.id || ''))
+    );
   });
 }
 
@@ -324,10 +444,12 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
     return;
   }
 
-  const hasActiveFilter = Boolean(filters.category || filters.model || filters.language || filters.tag);
+  const hasActiveFilter = Boolean(
+    filters.category || filters.style || filters.model || filters.language || filters.tag
+  );
 
   // 3. Weekly Pickup section (shown when no filters are active)
-  const pickupPosts = sortPosts(posts.filter((p) => p.weeklyPickup === true), 'published');
+  const pickupPosts = sortPosts(posts.filter((p) => p.weeklyPickup === true), 'published-desc');
   if (!hasActiveFilter && pickupPosts.length > 0) {
     const pickupSec = document.createElement('section');
     pickupSec.className = 'pickup-section';
@@ -351,14 +473,14 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
     const pickupGrid = document.createElement('div');
     pickupGrid.className = 'pickup-grid';
     pickupPosts.slice(0, 3).forEach((post) => {
-      pickupGrid.appendChild(createPromptCard(post));
+      pickupGrid.appendChild(createPromptCard(post, { sortBy: 'published-desc' }));
     });
 
     pickupSec.append(headRow, pickupGrid);
     container.appendChild(pickupSec);
   }
 
-  // 4. Filter Panel (Category, Model, Prompt Language, Tag, Sort)
+  // 4. Filter Panel (Category, Style, Model, Prompt Language, Tag, Sort)
   const configuredCategories = Array.isArray(siteConfig?.categories) ? siteConfig.categories : [];
   const presentCategories = new Set(posts.map((p) => p.category).filter(Boolean));
   if (filters.category) presentCategories.add(filters.category);
@@ -368,6 +490,11 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
       .filter((cat) => !configuredCategories.includes(cat))
       .sort((a, b) => a.localeCompare(b, 'ja')),
   ];
+
+  const styleOptions = Object.keys(POST_STYLES).map((code) => ({
+    value: code,
+    label: getStyleLabel(code),
+  }));
 
   const models = [...new Set(posts.map((p) => p.model).filter(Boolean))].sort((a, b) =>
     a.localeCompare(b, 'ja')
@@ -389,20 +516,22 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ja'))
     .map(([tag]) => tag);
 
+  const activeSort = normalizeSortKey(filters.sort);
   const filtered = sortPosts(
     posts.filter((p) => {
       if (filters.category && p.category !== filters.category) return false;
+      if (filters.style && (p.style || 'other') !== filters.style) return false;
       if (filters.model && p.model !== filters.model) return false;
       if (filters.language && (p.promptLanguage || 'other') !== filters.language) return false;
       if (filters.tag && !(Array.isArray(p.tags) && p.tags.includes(filters.tag))) return false;
       return true;
     }),
-    filters.sort
+    activeSort
   );
 
   const filterPanel = document.createElement('section');
   filterPanel.className = 'filter-panel';
-  filterPanel.setAttribute('aria-label', '一覧の絞り込み');
+  filterPanel.setAttribute('aria-label', '一覧の絞り込み・並べ替え');
 
   const controls = document.createElement('div');
   controls.className = 'filter-controls';
@@ -415,6 +544,14 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
       options: categories,
       allLabel: 'すべてのカテゴリ',
       onChange: (value) => onFilterChange({ ...filters, category: value }),
+    }),
+    createSelectField({
+      id: 'filter-style',
+      label: '作風',
+      value: filters.style,
+      options: styleOptions,
+      allLabel: 'すべての作風',
+      onChange: (value) => onFilterChange({ ...filters, style: value }),
     }),
     createSelectField({
       id: 'filter-model',
@@ -433,7 +570,7 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
       onChange: (value) => onFilterChange({ ...filters, language: value }),
     }),
     createSortField({
-      value: filters.sort,
+      value: activeSort,
       onChange: (value) => onFilterChange({ ...filters, sort: value }),
     })
   );
@@ -477,7 +614,7 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
   countSpan.append(
     document.createTextNode('表示中: '),
     strongCount,
-    document.createTextNode(` / 全${posts.length}件（プロンプト本文は保持しないため、カテゴリ・モデル・プロンプト言語・タグで絞り込めます）`)
+    document.createTextNode(` / 全${posts.length}件（プロンプト本文は保持しないため、カテゴリ・作風・モデル・プロンプト言語・タグで絞り込めます）`)
   );
   metaRow.appendChild(countSpan);
 
@@ -487,7 +624,7 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
     resetBtn.className = 'btn btn--ghost btn--sm';
     resetBtn.textContent = '絞り込みを解除';
     resetBtn.addEventListener('click', () => {
-      onFilterChange({ category: '', model: '', language: '', tag: '', sort: filters.sort });
+      onFilterChange({ category: '', style: '', model: '', language: '', tag: '', sort: activeSort });
     });
     metaRow.appendChild(resetBtn);
   }
@@ -500,8 +637,14 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
   listHeadingRow.className = 'section-heading-row';
   const listH2 = document.createElement('h2');
   listH2.className = 'section-title';
-  listH2.textContent = hasActiveFilter ? '絞り込み結果' : '新着ギャラリー';
-  listHeadingRow.appendChild(listH2);
+  listH2.textContent = hasActiveFilter ? '絞り込み結果' : 'ギャラリー一覧';
+
+  const activeSortOption = SORT_OPTIONS.find((opt) => opt.value === activeSort) || SORT_OPTIONS[0];
+  const sortSub = document.createElement('span');
+  sortSub.className = 'section-subtitle';
+  sortSub.textContent = `並び順：${activeSortOption.label}`;
+
+  listHeadingRow.append(listH2, sortSub);
   container.appendChild(listHeadingRow);
 
   if (filtered.length === 0) {
@@ -518,7 +661,7 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
     resetBtn.className = 'btn btn--primary';
     resetBtn.textContent = 'すべての絞り込みを解除';
     resetBtn.addEventListener('click', () => {
-      onFilterChange({ category: '', model: '', language: '', tag: '', sort: filters.sort });
+      onFilterChange({ category: '', style: '', model: '', language: '', tag: '', sort: activeSort });
     });
 
     noMatch.append(h, p, resetBtn);
@@ -530,7 +673,7 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
   grid.className = 'gallery-grid';
   const fragment = document.createDocumentFragment();
   filtered.forEach((post) => {
-    fragment.appendChild(createPromptCard(post));
+    fragment.appendChild(createPromptCard(post, { sortBy: activeSort }));
   });
   grid.appendChild(fragment);
   container.appendChild(grid);
@@ -586,16 +729,14 @@ function createSortField({ value, onChange }) {
   select.className = 'filter-select';
   select.id = 'filter-sort';
 
-  const opt1 = document.createElement('option');
-  opt1.value = 'published';
-  opt1.textContent = '新着順（掲載日）';
+  SORT_OPTIONS.forEach((item) => {
+    const opt = document.createElement('option');
+    opt.value = item.value;
+    opt.textContent = item.label;
+    select.appendChild(opt);
+  });
 
-  const opt2 = document.createElement('option');
-  opt2.value = 'original';
-  opt2.textContent = '元ポスト投稿日順';
-
-  select.append(opt1, opt2);
-  select.value = value === 'original' ? 'original' : 'published';
+  select.value = normalizeSortKey(value);
   select.addEventListener('change', () => onChange(select.value));
 
   wrap.append(labelEl, select);
