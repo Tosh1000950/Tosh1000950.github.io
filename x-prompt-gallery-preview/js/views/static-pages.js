@@ -10,6 +10,12 @@
 
 import { getSafeHttpsUrl } from '../url-utils.js';
 
+const DEFAULT_SITE_NAME_JA = 'みんなのプロンプト図鑑';
+const DEFAULT_TAGLINE_JA = 'Xでバズった画像・動画プロンプトを、作者のポストで見る図鑑';
+const SITE_NAME_EN = 'Minna no Prompt Zukan';
+const SITE_TAGLINE_EN =
+  'A field guide to viral image & video prompts on X — viewed at the creators’ own posts';
+
 function getSafeEmail(raw) {
   if (typeof raw !== 'string') return null;
   const trimmed = raw.trim();
@@ -110,6 +116,8 @@ function createInlineCode(text) {
 export function renderAboutView({ container, siteConfig, initialLang = 'ja' }) {
   const hubUrl = getSafeHttpsUrl(siteConfig?.operatorHubUrl) || 'https://tosh1000950.github.io/';
   const operatorName = siteConfig?.operatorName || 'Tosh1';
+  const siteName = siteConfig?.siteName || DEFAULT_SITE_NAME_JA;
+  const tagline = siteConfig?.tagline || DEFAULT_TAGLINE_JA;
 
   mountStaticPage({
     container,
@@ -118,9 +126,7 @@ export function renderAboutView({ container, siteConfig, initialLang = 'ja' }) {
       shell.appendChild(
         createPageHeader({
           title: 'このサイトについて',
-          lead:
-            siteConfig?.tagline ||
-            '画像もプロンプトも抜きません。一次ソースはXに置いたまま、作者のポストに返します。',
+          lead: `${siteName}は、${tagline}です。画像もプロンプトも抜きません。一次ソースはXに置いたまま、作者のポストに返します。`,
           langToggle,
         })
       );
@@ -132,7 +138,7 @@ export function renderAboutView({ container, siteConfig, initialLang = 'ja' }) {
       h2Three.textContent = '三方良しの宣言';
       const pThree = document.createElement('p');
       pThree.textContent =
-        '本サイトは「利用者」「プロンプト作者」「運営者」の3者すべてに価値が返る設計だけを前提に運営します。どれか1つでも損なう機能は実装しません。';
+        `${siteName}は「利用者」「プロンプト作者」「運営者」の3者すべてに価値が返る設計だけを前提に運営します。どれか1つでも損なう機能は実装しません。`;
 
       const grid = document.createElement('div');
       grid.className = 'three-way-grid';
@@ -275,9 +281,8 @@ export function renderAboutView({ container, siteConfig, initialLang = 'ja' }) {
     renderEn: (shell, langToggle) => {
       shell.appendChild(
         createPageHeader({
-          title: 'About This Site (For Creators)',
-          lead:
-            'We never copy prompts and never re-host images or videos. The original X post stays the single source of truth, and every visitor is sent back to the creator.',
+          title: `About ${SITE_NAME_EN} (For Creators)`,
+          lead: `${SITE_TAGLINE_EN}. We never copy prompts and never re-host images or videos — the original X post stays the single source of truth, and every visitor is sent back to the creator.`,
           langToggle,
         })
       );
@@ -289,7 +294,7 @@ export function renderAboutView({ container, siteConfig, initialLang = 'ja' }) {
       h2Three.textContent = 'Our "Three-Way-Win" Principle';
       const pThree = document.createElement('p');
       pThree.textContent =
-        'This is a curated Japanese-language index of trending AI image and video generation prompts on X. Unlike aggregator sites that scrape and re-host work, we are built specifically to send Japanese readers, impressions, and followers back to your original X post.';
+        `${SITE_NAME_EN} is a curated Japanese-language field guide to trending AI image and video generation prompts on X. Unlike aggregator sites that scrape and re-host work, we are built specifically to send Japanese readers, impressions, and followers back to your original X post.`;
 
       const grid = document.createElement('div');
       grid.className = 'three-way-grid';
@@ -401,6 +406,7 @@ export function renderAboutView({ container, siteConfig, initialLang = 'ja' }) {
    ========================================================================== */
 
 export function renderSubmitView({ container, siteConfig, initialLang = 'ja' }) {
+  const siteName = siteConfig?.siteName || DEFAULT_SITE_NAME_JA;
   const subUrl = getSafeHttpsUrl(siteConfig?.contact?.submissionUrl);
   const subEmail =
     getSafeEmail(siteConfig?.contact?.submissionEmail) ||
@@ -414,7 +420,7 @@ export function renderSubmitView({ container, siteConfig, initialLang = 'ja' }) 
         createPageHeader({
           title: '自薦・掲載依頼の案内',
           lead:
-            'プロンプト作者ご本人からの自薦を歓迎しています。掲載されたエントリからは、作者名・@ハンドル・X公式埋め込み・プロフィール導線を通じて元ポストへ直接アクセスが返ります。',
+            `${siteName}では、プロンプト作者ご本人からの自薦を歓迎しています。掲載されたエントリからは、作者名・@ハンドル・X公式埋め込み・プロフィール導線を通じて元ポストへ直接アクセスが返ります。`,
           langToggle,
         })
       );
@@ -491,7 +497,7 @@ export function renderSubmitView({ container, siteConfig, initialLang = 'ja' }) 
         }
 
         if (subEmail) {
-          const subject = encodeURIComponent('【自薦・掲載依頼 / Prompt Submission】');
+          const subject = encodeURIComponent(`【自薦・掲載依頼 / Prompt Submission】${siteName}`);
           const bodyText = encodeURIComponent(
             '1. 対象ポストURL / Parent Post URL：\n2. プロンプトの場所 / Prompt Location：\n3. 対応モデル・作風・言語 / Model, Style & Language：\n4. 補足メモ（任意）/ Optional Note：\n'
           );
@@ -531,7 +537,7 @@ export function renderSubmitView({ container, siteConfig, initialLang = 'ja' }) 
         createPageHeader({
           title: 'Submit Your Prompt Post',
           lead:
-            'Self-nominations from creators worldwide are welcome (English, Japanese, Chinese, Korean, and other prompt languages). We never copy your prompt or re-host your media — visitors go directly to your X post and profile.',
+            `${SITE_NAME_EN} welcomes self-nominations from creators worldwide (English, Japanese, Chinese, Korean, and other prompt languages). We never copy your prompt or re-host your media — visitors go directly to your X post and profile.`,
           langToggle,
         })
       );
@@ -608,7 +614,7 @@ export function renderSubmitView({ container, siteConfig, initialLang = 'ja' }) 
         }
 
         if (subEmail) {
-          const subject = encodeURIComponent('[Prompt Submission] X Prompt Gallery');
+          const subject = encodeURIComponent(`[Prompt Submission] ${SITE_NAME_EN}`);
           const bodyText = encodeURIComponent(
             '1. Parent Post URL: \n2. Prompt Location: \n3. Model, Style & Prompt Language: \n4. Optional Note: \n'
           );
@@ -649,6 +655,7 @@ export function renderSubmitView({ container, siteConfig, initialLang = 'ja' }) 
    ========================================================================== */
 
 export function renderRemovalView({ container, siteConfig, prefillPostUrl, initialLang = 'ja' }) {
+  const siteName = siteConfig?.siteName || DEFAULT_SITE_NAME_JA;
   const operatorName = siteConfig?.operatorName || 'Tosh1';
   const removalUrl = getSafeHttpsUrl(siteConfig?.contact?.removalUrl);
   const removalEmail = getSafeEmail(siteConfig?.contact?.removalEmail);
@@ -661,7 +668,7 @@ export function renderRemovalView({ container, siteConfig, prefillPostUrl, initi
         createPageHeader({
           title: '掲載削除・修正の依頼',
           lead:
-            '作者ご本人からの掲載削除依頼には理由を問わず速やかに対応します。Xログイン基盤は設けず、なりすまし防止のための「確認コード方式」で本人確認を行います。処理は定期便でまとめて行い、一次対応は遅くとも72時間以内を目安とし完了をご連絡します。',
+            `${siteName}では、作者ご本人からの掲載削除依頼に理由を問わず速やかに対応します。Xログイン基盤は設けず、なりすまし防止のための「確認コード方式」で本人確認を行います。処理は定期便でまとめて行い、一次対応は遅くとも72時間以内を目安とし完了をご連絡します。`,
           langToggle,
         })
       );
@@ -877,7 +884,7 @@ export function renderRemovalView({ container, siteConfig, prefillPostUrl, initi
         }
 
         if (removalEmail) {
-          const subject = encodeURIComponent('【掲載削除・修正依頼 / Removal Request】');
+          const subject = encodeURIComponent(`【掲載削除・修正依頼 / Removal Request】${siteName}`);
           const bodyText = encodeURIComponent(
             `1. 対象ポストURL / Post URL：${prefillPostUrl || ''}\n2. 希望する対応 / Requested action：\n3. 確認コードの掲載先 / Where the code was posted：\n`
           );
@@ -917,7 +924,7 @@ export function renderRemovalView({ container, siteConfig, prefillPostUrl, initi
         createPageHeader({
           title: 'Removal & Correction Request',
           lead:
-            'We honor verified creator takedown requests promptly for any reason. To prevent impersonation without requiring an X login, we verify ownership using a simple verification-code flow. Requests are processed in our regular curation batch (initial response within 72 hours at most), and we notify you once completed.',
+            `At ${SITE_NAME_EN}, we honor verified creator takedown requests promptly for any reason. To prevent impersonation without requiring an X login, we verify ownership using a simple verification-code flow. Requests are processed in our regular curation batch (initial response within 72 hours at most), and we notify you once completed.`,
           langToggle,
         })
       );
@@ -1130,7 +1137,7 @@ export function renderRemovalView({ container, siteConfig, prefillPostUrl, initi
         }
 
         if (removalEmail) {
-          const subject = encodeURIComponent('[Removal Request] X Prompt Gallery');
+          const subject = encodeURIComponent(`[Removal Request] ${SITE_NAME_EN}`);
           const bodyText = encodeURIComponent(
             `1. Post URL: ${prefillPostUrl || ''}\n2. Requested action: \n3. Where the code was posted: \n`
           );
