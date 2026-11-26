@@ -20,6 +20,7 @@ const state = {
   filters: {
     category: '',
     model: '',
+    language: '',
     tag: '',
     sort: 'published',
   },
@@ -176,6 +177,7 @@ function renderBaseView(route) {
     renderAboutView({
       container: dom.main,
       siteConfig: state.siteConfig,
+      initialLang: route.params.get('lang') === 'en' ? 'en' : 'ja',
     });
     return;
   }
@@ -186,6 +188,7 @@ function renderBaseView(route) {
     renderSubmitView({
       container: dom.main,
       siteConfig: state.siteConfig,
+      initialLang: route.params.get('lang') === 'en' ? 'en' : 'ja',
     });
     return;
   }
@@ -197,6 +200,7 @@ function renderBaseView(route) {
       container: dom.main,
       siteConfig: state.siteConfig,
       prefillPostUrl: route.params.get('post') || '',
+      initialLang: route.params.get('lang') === 'en' ? 'en' : 'ja',
     });
     return;
   }
