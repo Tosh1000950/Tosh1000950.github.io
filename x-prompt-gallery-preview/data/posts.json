@@ -1,6 +1,6 @@
 {
-  "_schemaVersion": "2.1",
-  "_policyNotice": "三方良し仕様書 v2.1 準拠: プロンプト本文フィールドは一切設けません。画像・動画ファイルもリポジトリに保存せず、Xの画像CDN（pbs.twimg.com）のURL文字列のみを記録します（動画ポストはサムネイル直リンク＋詳細の公式埋め込み内再生のみ）。公開するレコードのみ enabled: true にしてください。",
+  "_schemaVersion": "2.2",
+  "_policyNotice": "三方良し仕様書 v2.1（2026-11-27改訂：作風・いいね数スナップショット・Googleフォーム主窓口対応）準拠: プロンプト本文フィールドは一切設けません。画像・動画ファイルもリポジトリに保存せず、Xの画像CDN（pbs.twimg.com）のURL文字列のみを記録します（動画ポストはサムネイル直リンク＋詳細の公式埋め込み内再生のみ）。公開するレコードのみ enabled: true にしてください。",
   "siteConfig": {
     "siteName": "【仮称】Xバズプロンプト図鑑",
     "isPlaceholderName": true,
@@ -19,9 +19,10 @@
       "その他・実験"
     ],
     "contact": {
-      "submissionNote": "【未決定・仮置き】自薦・掲載依頼の受付窓口（Xリプライ／専用フォーム／GitHub等）を決定後、data/posts.json の siteConfig.contact に設定してください。",
+      "submissionNote": "自薦・掲載依頼は専用Webフォーム（Googleフォーム／日英併記）を主窓口とし、メールを補助連絡先として併記する方針で決定済みです。公開準備時に運営者のGoogleアカウントでフォームを作成後、data/posts.json の siteConfig.contact（submissionUrl / submissionEmail）に設定すると、ここに直接リンクが表示されます。",
       "submissionUrl": "",
-      "removalNote": "【未決定・仮置き】確認コード方式による掲載削除・修正依頼の受付窓口（専用フォームURL／メールアドレス／Xアカウント等）を決定後、data/posts.json の siteConfig.contact に設定してください。",
+      "submissionEmail": "",
+      "removalNote": "確認コード方式による掲載削除・修正依頼は専用Webフォーム（Googleフォーム／日英併記）を主窓口とし、メールを補助連絡先として併記する方針で決定済みです。公開準備時に運営者のGoogleアカウントでフォームを作成後、data/posts.json の siteConfig.contact（removalUrl / removalEmail）に設定すると、ここに直接リンクが表示されます。",
       "removalUrl": "",
       "removalEmail": ""
     }
@@ -48,6 +49,8 @@
         "videoThumbnailNote": "mediaType が video の場合は { \"url\": \"https://pbs.twimg.com/...\", \"alt\": \"...\" } を必須指定（ext_tw_video_thumb / amplify_video_thumb / tweet_video_thumb / media 等）。video.twimg.com や .mp4 の直リンクは禁止。mediaType が image の場合は null にします。",
         "promptLanguageOptions": "ja（日本語） | en（英語） | zh（中国語） | ko（韓国語） | other（その他）",
         "categoryOptions": "siteConfig.categories の固定語彙から1つ選択: 人物・ポートレート | イラスト・アニメ | 風景・建築 | デザイン・タイポ | プロダクト・食べ物 | 映像・シネマティック | その他・実験",
+        "styleOptions": "real（実写系） | anime（アニメ系） | illust（イラスト系） | cg3d（3D・CG系） | pixel（ドット・ゲーム系） | other（その他）",
+        "likesAtCurationNote": "収集時点のいいね数スナップショット（0以上の整数）。一覧のいいね数順ソートに使用します。自由記述の reactionNote も併用できます。",
         "imagesNote": "mediaType が image の場合は X で画像を開いて取得した https://pbs.twimg.com/media/... URL文字列を1件以上配列で入れます（mediaType が video の場合は空配列 [] で可）。一覧（small/medium）と詳細（large）のサイズ指定はサイト側がURLのnameパラメータで自動出し分けします。"
       },
       "title": "【テンプレート】日本語タイトル（運営者が作成：どんな画風・表現か一目で分かる名前）",
@@ -71,6 +74,7 @@
       ],
       "model": "対応生成モデル名（例: Midjourney v7 / FLUX / GPT Image / Nano Banana / Kling / Sora / Veo 等）",
       "category": "人物・ポートレート",
+      "style": "real",
       "tags": [
         "タグ1",
         "タグ2",
@@ -78,6 +82,7 @@
       ],
       "publishedAt": "2026-11-26",
       "originalPostedAt": "2026-11-25",
+      "likesAtCuration": 42000,
       "reactionNote": "収集時点メモ（任意）：例「いいね 4.2万 / ブックマーク 1.8万（2026-11-26確認）」",
       "guidance": "案内文（任意・1〜3行）：被写体や配色、時間帯の語句を差し替えると別シーンにも応用しやすい、など運営者の言葉で補足します。",
       "weeklyPickup": false,
@@ -114,12 +119,14 @@
       ],
       "model": "TEST-Verification",
       "category": "その他・実験",
+      "style": "real",
       "tags": [
         "TEST",
         "埋め込み検証"
       ],
       "publishedAt": "2026-11-26",
       "originalPostedAt": "2022-07-11",
+      "likesAtCuration": 17000,
       "reactionNote": "技術検証専用レコード（enabled: false）",
       "guidance": "【TEST】運営者による応用メモ表示欄の確認用テキストです。",
       "weeklyPickup": false,
