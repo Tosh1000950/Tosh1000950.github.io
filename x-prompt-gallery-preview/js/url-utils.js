@@ -403,16 +403,186 @@ export function getPostMediaGallery(post) {
   return list;
 }
 
+const TWITTER_SNOWFLAKE_EPOCH_MS = 1288834974657n;
+const MIN_SNOWFLAKE_TWEET_ID = 100000000000000n;
+const MAX_VALID_TIMESTAMP_MS = 4102444800000; // 2100-01-01T00:00:00Z
+const DISPLAY_TIME_ZONE = 'Asia/Tokyo';
+const ISO_DATE_ONLY_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
+const ISO_DATETIME_RE =
+  /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d{1,6})?)?(?:Z|[+-]\d{2}:?\d{2})?$/i;
+const ISO_DATETIME_NO_TZ_RE = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d{1,6})?)?$/;
+const RFC2822_DATETIME_RE =
+  /^(?:(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s+)?(?:[A-Z][a-z]{2}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2}\s+[+-]\d{4}\s+\d{4}|\d{1,2}\s+[A-Z][a-z]{2}\s+\d{4}\s+\d{2}:\d{2}(?::\d{2})?\s+(?:GMT|UTC|[+-]\d{4}))$/;
+
 /**
- * Format YYYY-MM-DD as Japanese date (e.g. "2026年11月26日").
+ * Extract the exact UTC creation timestamp (epoch ms) from an X/Twitter Snowflake status URL.
+ * Returns null for non-X URLs, pre-Snowflake IDs, or placeholder IDs (e.g. 0000000000000000000).
+ * @param {string} rawUrl
+ * @returns {number | null}
+ */
+export function extractTweetTimestampMs(rawUrl) {
+  const tweetId = extractTweetId(rawUrl);
+  if (!tweetId) return null;
+  let idBig;
+  try {
+    idBig = BigInt(tweetId);
+  } catch {
+    return null;
+  }
+  if (idBig < MIN_SNOWFLAKE_TWEET_ID) return null;
+  const ms = Number((idBig >> 22n) + TWITTER_SNOWFLAKE_EPOCH_MS);
+  if (!Number.isFinite(ms) || ms < Number(TWITTER_SNOWFLAKE_EPOCH_MS) || ms > MAX_VALID_TIMESTAMP_MS) {
+    return null;
+  }
+  return ms;
+}
+
+/**
+ * Format an epoch millisecond timestamp as YYYY-MM-DD in the specified IANA time zone.
+ * @param {number} ms
+ * @param {string} [timeZone='Asia/Tokyo']
+ * @returns {string | null}
+ */
+export function formatTimestampYmdInTimeZone(ms, timeZone = DISPLAY_TIME_ZONE) {
+  if (typeof ms !== 'number' || !Number.isFinite(ms)) return null;
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date(ms));
+  const year = parts.find((p) => p.type === 'year')?.value;
+  const month = parts.find((p) => p.type === 'month')?.value;
+  const day = parts.find((p) => p.type === 'day')?.value;
+  if (!year || !month || !day) return null;
+  return `${year}-${month}-${day}`;
+}
+
+function parseDateOnlyToUtcMidnightMs(raw) {
+  if (typeof raw !== 'string') return null;
+  const match = raw.trim().match(ISO_DATE_ONLY_RE);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const ms = Date.UTC(year, month - 1, day);
+  const check = new Date(ms);
+  if (
+    check.getUTCFullYear() !== year ||
+    check.getUTCMonth() !== month - 1 ||
+    check.getUTCDate() !== day
+  ) {
+    return null;
+  }
+  return ms;
+}
+
+function parseUtcDatetimeMs(raw) {
+  if (typeof raw !== 'string') return null;
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  if (ISO_DATETIME_RE.test(trimmed)) {
+    const normalized = ISO_DATETIME_NO_TZ_RE.test(trimmed)
+      ? `${trimmed.replace(' ', 'T')}Z`
+      : trimmed.replace(' ', 'T');
+    const ms = Date.parse(normalized);
+    return Number.isFinite(ms) ? ms : null;
+  }
+  if (RFC2822_DATETIME_RE.test(trimmed)) {
+    const ms = Date.parse(trimmed);
+    return Number.isFinite(ms) ? ms : null;
+  }
+  return null;
+}
+
+/**
+ * Resolve a post's original posting date in Asia/Tokyo (JST) without altering stored UTC data.
+ * - Full UTC/offset timestamps (ISO-8601 or RFC 2822) are converted directly to Asia/Tokyo.
+ * - Date-only YYYY-MM-DD strings stored from UTC API responses are resolved to their exact
+ *   Asia/Tokyo date via the parent post's Twitter/X Snowflake ID when consistent (within ±1 day),
+ *   so posts made between 15:00–23:59 UTC match the official X embed's Japan-time date.
+ * @param {string} originalPostedAt
+ * @param {string} [parentPostUrl='']
+ * @returns {{ ymd: string | null, sortMs: number | null }}
+ */
+export function resolveOriginalPostDateJst(originalPostedAt, parentPostUrl = '') {
+  if (typeof originalPostedAt !== 'string' || !originalPostedAt.trim()) {
+    return { ymd: null, sortMs: null };
+  }
+  const trimmed = originalPostedAt.trim();
+
+  const dateOnlyUtcMs = parseDateOnlyToUtcMidnightMs(trimmed);
+  if (dateOnlyUtcMs !== null) {
+    const sfMs = extractTweetTimestampMs(parentPostUrl);
+    if (sfMs !== null) {
+      const sfUtcYmd = formatTimestampYmdInTimeZone(sfMs, 'UTC');
+      const sfUtcMidnightMs = parseDateOnlyToUtcMidnightMs(sfUtcYmd);
+      if (sfUtcMidnightMs !== null && Math.abs(sfUtcMidnightMs - dateOnlyUtcMs) <= 86400000) {
+        return {
+          ymd: formatTimestampYmdInTimeZone(sfMs, DISPLAY_TIME_ZONE),
+          sortMs: sfMs,
+        };
+      }
+    }
+    return { ymd: trimmed, sortMs: dateOnlyUtcMs };
+  }
+
+  const tsMs = parseUtcDatetimeMs(trimmed);
+  if (tsMs !== null) {
+    return {
+      ymd: formatTimestampYmdInTimeZone(tsMs, DISPLAY_TIME_ZONE),
+      sortMs: tsMs,
+    };
+  }
+
+  return { ymd: null, sortMs: null };
+}
+
+/**
+ * Get the numeric sort timestamp (epoch ms) for a post's originalPostedAt (consistent with JST display).
+ * @param {{ originalPostedAt?: string, parentPostUrl?: string }} post
+ * @returns {number | null}
+ */
+export function getOriginalPostSortMs(post) {
+  if (!post) return null;
+  return resolveOriginalPostDateJst(post.originalPostedAt, post.parentPostUrl).sortMs;
+}
+
+/**
+ * Format an original X post date in Japanese using Asia/Tokyo (JST) time (e.g. "2022年7月11日").
+ * @param {string} originalPostedAt
+ * @param {string} [parentPostUrl='']
+ * @returns {string}
+ */
+export function formatOriginalPostDateJa(originalPostedAt, parentPostUrl = '') {
+  if (typeof originalPostedAt !== 'string' || !originalPostedAt.trim()) return '—';
+  const { ymd } = resolveOriginalPostDateJst(originalPostedAt, parentPostUrl);
+  if (ymd) return formatDateJa(ymd);
+  return formatDateJa(originalPostedAt);
+}
+
+/**
+ * Format YYYY-MM-DD (or a full UTC/ISO timestamp converted to Asia/Tokyo) as Japanese date
+ * (e.g. "2026年11月26日").
  * @param {string} isoDate
  * @returns {string}
  */
 export function formatDateJa(isoDate) {
-  if (typeof isoDate !== 'string') return '—';
-  const match = isoDate.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!match) return isoDate;
-  return `${match[1]}年${Number(match[2])}月${Number(match[3])}日`;
+  if (typeof isoDate !== 'string' || !isoDate.trim()) return '—';
+  const trimmed = isoDate.trim();
+  const match = trimmed.match(ISO_DATE_ONLY_RE);
+  if (match) {
+    return `${match[1]}年${Number(match[2])}月${Number(match[3])}日`;
+  }
+  const tsMs = parseUtcDatetimeMs(trimmed);
+  if (tsMs !== null) {
+    const jstYmd = formatTimestampYmdInTimeZone(tsMs, DISPLAY_TIME_ZONE);
+    const jstMatch = jstYmd?.match(ISO_DATE_ONLY_RE);
+    if (jstMatch) {
+      return `${jstMatch[1]}年${Number(jstMatch[2])}月${Number(jstMatch[3])}日`;
+    }
+  }
+  return isoDate;
 }
 
 /**
