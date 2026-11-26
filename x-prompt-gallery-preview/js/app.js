@@ -19,10 +19,11 @@ const state = {
   posts: [], // Strictly enabled === true records only
   filters: {
     category: '',
+    style: '',
     model: '',
     language: '',
     tag: '',
-    sort: 'published',
+    sort: 'original-desc',
   },
   lastNonPostHash: '#/',
   savedScrollY: 0,
