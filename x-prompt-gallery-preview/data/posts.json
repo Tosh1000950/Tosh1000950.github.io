@@ -2,9 +2,9 @@
   "_schemaVersion": "2.2",
   "_policyNotice": "三方良し仕様書 v2.1（2026-11-27改訂：作風・いいね数スナップショット・Googleフォーム主窓口対応）準拠: プロンプト本文フィールドは一切設けません。画像・動画ファイルもリポジトリに保存せず、Xの画像CDN（pbs.twimg.com）のURL文字列のみを記録します（動画ポストはサムネイル直リンク＋詳細の公式埋め込み内再生のみ）。公開するレコードのみ enabled: true にしてください。",
   "siteConfig": {
-    "siteName": "【仮称】Xバズプロンプト図鑑",
-    "isPlaceholderName": true,
-    "tagline": "画像もプロンプトも抜きません。一次ソースはXに置いたまま、作者のポストに返します。",
+    "siteName": "みんなのプロンプト図鑑",
+    "isPlaceholderName": false,
+    "tagline": "Xでバズった画像・動画プロンプトを、作者のポストで見る図鑑",
     "siteUrl": "https://tosh1000950.github.io/x-prompt-gallery/",
     "isPlaceholderUrl": true,
     "operatorName": "Tosh1",
