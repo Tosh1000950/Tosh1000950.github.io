@@ -9,30 +9,40 @@
  */
 
 import {
+  PROMPT_LANGUAGES,
   buildCardImageSrcSet,
   buildPbsImageUrl,
   formatDateJa,
+  getPostCardThumbnail,
+  getPromptLanguageLabel,
   hasSeparatePromptPost,
+  isVideoPost,
   normalizeHandle,
   normalizeImageItem,
 } from '../url-utils.js';
 
 /**
- * Create a single direct-linked image card element (reused in List, Weekly, and Author views).
+ * Create a single direct-linked image / video-thumbnail card element
+ * (reused in List, Weekly, and Author views).
  * @param {object} post
  * @returns {HTMLElement}
  */
 export function createPromptCard(post) {
+  const isVideo = isVideoPost(post);
   const article = document.createElement('article');
-  article.className = 'prompt-card';
+  article.className = isVideo ? 'prompt-card prompt-card--video' : 'prompt-card';
   article.dataset.postId = post.id;
+  article.dataset.mediaType = isVideo ? 'video' : 'image';
+  if (post.promptLanguage) {
+    article.dataset.promptLanguage = post.promptLanguage;
+  }
 
   const images = (Array.isArray(post.images) ? post.images : [])
     .map((item) => normalizeImageItem(item, post.title))
     .filter(Boolean);
-  const firstImage = images[0] || null;
-  const mediumUrl = firstImage ? buildPbsImageUrl(firstImage.url, 'medium') : null;
-  const srcSet = firstImage ? buildCardImageSrcSet(firstImage.url) : '';
+  const primaryThumb = getPostCardThumbnail(post);
+  const mediumUrl = primaryThumb ? buildPbsImageUrl(primaryThumb.url, 'medium') : null;
+  const srcSet = primaryThumb ? buildCardImageSrcSet(primaryThumb.url) : '';
 
   const mediaWrap = document.createElement('div');
   mediaWrap.className = 'card-media';
@@ -45,26 +55,41 @@ export function createPromptCard(post) {
       img.srcset = srcSet;
       img.sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 340px';
     }
-    img.alt = firstImage.alt || post.title;
+    img.alt = primaryThumb.alt || post.title;
     img.loading = 'lazy';
     img.decoding = 'async';
     img.referrerPolicy = 'no-referrer';
     img.addEventListener('error', () => {
       img.remove();
-      mediaWrap.appendChild(createCardImageFallback());
+      mediaWrap.appendChild(createCardImageFallback(isVideo));
     });
     mediaWrap.appendChild(img);
   } else {
-    mediaWrap.appendChild(createCardImageFallback());
+    mediaWrap.appendChild(createCardImageFallback(isVideo));
+  }
+
+  // Site-UI play-badge overlay for video posts (SPEC §4.2 — thumbnail direct link, playback only in detail embed)
+  if (isVideo) {
+    const playOverlay = document.createElement('div');
+    playOverlay.className = 'card-play-overlay';
+    playOverlay.setAttribute('aria-hidden', 'true');
+    playOverlay.innerHTML =
+      '<span class="card-play-circle"><svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" focusable="false"><path d="M8 5.14v13.72a1 1 0 0 0 1.53.85l10.6-6.86a1 1 0 0 0 0-1.7L9.53 4.29A1 1 0 0 0 8 5.14z"/></svg></span>';
+    mediaWrap.appendChild(playOverlay);
   }
 
   // Primary stretched link opens detail view (accessible keyboard + right-click support)
   const cardLink = document.createElement('a');
   cardLink.className = 'card-stretched-link';
   cardLink.href = `#/post/${encodeURIComponent(post.id)}`;
-  cardLink.setAttribute('aria-label', `${post.title}（詳細とX公式埋め込みを見る）`);
+  cardLink.setAttribute(
+    'aria-label',
+    isVideo
+      ? `${post.title}（動画ポスト：詳細のX公式埋め込みで再生）`
+      : `${post.title}（詳細とX公式埋め込みを見る）`
+  );
 
-  // Top overlay: model, category, multi-image / thread badges
+  // Top overlay: model, category, video / language / multi-image / thread badges
   const topOverlay = document.createElement('div');
   topOverlay.className = 'card-top-overlay';
 
@@ -88,7 +113,21 @@ export function createPromptCard(post) {
   const rightBadges = document.createElement('div');
   rightBadges.className = 'card-badges-right';
 
-  if (images.length > 1) {
+  if (isVideo) {
+    const videoBadge = document.createElement('span');
+    videoBadge.className = 'card-badge card-badge--video';
+    videoBadge.textContent = '▶ 動画';
+    rightBadges.appendChild(videoBadge);
+  }
+
+  if (post.promptLanguage) {
+    const langBadge = document.createElement('span');
+    langBadge.className = 'card-badge card-badge--lang';
+    langBadge.textContent = getPromptLanguageLabel(post.promptLanguage);
+    rightBadges.appendChild(langBadge);
+  }
+
+  if (!isVideo && images.length > 1) {
     const countBadge = document.createElement('span');
     countBadge.className = 'card-badge';
     countBadge.textContent = `${images.length}枚`;
@@ -156,16 +195,18 @@ export function createPromptCard(post) {
   return article;
 }
 
-function createCardImageFallback() {
+function createCardImageFallback(isVideo = false) {
   const wrap = document.createElement('div');
   wrap.className = 'card-img-fallback';
 
   const title = document.createElement('span');
   title.className = 'card-img-fallback-title';
-  title.textContent = '画像を読み込めませんでした';
+  title.textContent = isVideo ? '動画サムネイルを読み込めませんでした' : '画像を読み込めませんでした';
 
   const sub = document.createElement('span');
-  sub.textContent = '詳細からX元ポストを確認できます';
+  sub.textContent = isVideo
+    ? '詳細のX公式埋め込みから再生・確認できます'
+    : '詳細からX元ポストを確認できます';
 
   wrap.append(title, sub);
   return wrap;
@@ -222,7 +263,7 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
   const sub = document.createElement('p');
   sub.className = 'manifesto-sub';
   sub.textContent =
-    '気になる画像をタップすると、大きな画像とX公式埋め込みを並べて表示。プロンプトの場所案内から元ポストへ迷わず辿れます。';
+    '気になる画像・動画サムネイルをタップすると、大きな表示とX公式埋め込みを並べて確認でき、プロンプトの場所案内から元ポストへ迷わず辿れます。';
 
   bannerText.append(kicker, headline, sub);
 
@@ -283,7 +324,7 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
     return;
   }
 
-  const hasActiveFilter = Boolean(filters.category || filters.model || filters.tag);
+  const hasActiveFilter = Boolean(filters.category || filters.model || filters.language || filters.tag);
 
   // 3. Weekly Pickup section (shown when no filters are active)
   const pickupPosts = sortPosts(posts.filter((p) => p.weeklyPickup === true), 'published');
@@ -317,13 +358,27 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
     container.appendChild(pickupSec);
   }
 
-  // 4. Filter Panel (Category, Model, Tag, Sort)
-  const categories = [...new Set(posts.map((p) => p.category).filter(Boolean))].sort((a, b) =>
-    a.localeCompare(b, 'ja')
-  );
+  // 4. Filter Panel (Category, Model, Prompt Language, Tag, Sort)
+  const configuredCategories = Array.isArray(siteConfig?.categories) ? siteConfig.categories : [];
+  const presentCategories = new Set(posts.map((p) => p.category).filter(Boolean));
+  if (filters.category) presentCategories.add(filters.category);
+  const categories = [
+    ...configuredCategories.filter((cat) => presentCategories.has(cat)),
+    ...[...presentCategories]
+      .filter((cat) => !configuredCategories.includes(cat))
+      .sort((a, b) => a.localeCompare(b, 'ja')),
+  ];
+
   const models = [...new Set(posts.map((p) => p.model).filter(Boolean))].sort((a, b) =>
     a.localeCompare(b, 'ja')
   );
+
+  const presentLangSet = new Set(posts.map((p) => p.promptLanguage || 'other'));
+  if (filters.language) presentLangSet.add(filters.language);
+  const languageOptions = Object.keys(PROMPT_LANGUAGES)
+    .filter((code) => presentLangSet.has(code))
+    .map((code) => ({ value: code, label: getPromptLanguageLabel(code) }));
+
   const tagCounts = new Map();
   posts.forEach((p) => {
     (Array.isArray(p.tags) ? p.tags : []).forEach((t) => {
@@ -338,6 +393,7 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
     posts.filter((p) => {
       if (filters.category && p.category !== filters.category) return false;
       if (filters.model && p.model !== filters.model) return false;
+      if (filters.language && (p.promptLanguage || 'other') !== filters.language) return false;
       if (filters.tag && !(Array.isArray(p.tags) && p.tags.includes(filters.tag))) return false;
       return true;
     }),
@@ -367,6 +423,14 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
       options: models,
       allLabel: 'すべてのモデル',
       onChange: (value) => onFilterChange({ ...filters, model: value }),
+    }),
+    createSelectField({
+      id: 'filter-language',
+      label: 'プロンプト言語',
+      value: filters.language,
+      options: languageOptions,
+      allLabel: 'すべての言語',
+      onChange: (value) => onFilterChange({ ...filters, language: value }),
     }),
     createSortField({
       value: filters.sort,
@@ -413,7 +477,7 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
   countSpan.append(
     document.createTextNode('表示中: '),
     strongCount,
-    document.createTextNode(` / 全${posts.length}件（プロンプト本文は保持しないため、カテゴリ・モデル・タグで絞り込めます）`)
+    document.createTextNode(` / 全${posts.length}件（プロンプト本文は保持しないため、カテゴリ・モデル・プロンプト言語・タグで絞り込めます）`)
   );
   metaRow.appendChild(countSpan);
 
@@ -423,7 +487,7 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
     resetBtn.className = 'btn btn--ghost btn--sm';
     resetBtn.textContent = '絞り込みを解除';
     resetBtn.addEventListener('click', () => {
-      onFilterChange({ category: '', model: '', tag: '', sort: filters.sort });
+      onFilterChange({ category: '', model: '', language: '', tag: '', sort: filters.sort });
     });
     metaRow.appendChild(resetBtn);
   }
@@ -454,7 +518,7 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
     resetBtn.className = 'btn btn--primary';
     resetBtn.textContent = 'すべての絞り込みを解除';
     resetBtn.addEventListener('click', () => {
-      onFilterChange({ category: '', model: '', tag: '', sort: filters.sort });
+      onFilterChange({ category: '', model: '', language: '', tag: '', sort: filters.sort });
     });
 
     noMatch.append(h, p, resetBtn);
@@ -490,10 +554,15 @@ function createSelectField({ id, label, value, options, allLabel, onChange }) {
   allOpt.textContent = allLabel;
   select.appendChild(allOpt);
 
-  options.forEach((optVal) => {
+  options.forEach((optItem) => {
     const opt = document.createElement('option');
-    opt.value = optVal;
-    opt.textContent = optVal;
+    if (typeof optItem === 'string') {
+      opt.value = optItem;
+      opt.textContent = optItem;
+    } else {
+      opt.value = optItem.value;
+      opt.textContent = optItem.label;
+    }
     select.appendChild(opt);
   });
 
