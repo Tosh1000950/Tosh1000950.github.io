@@ -6,8 +6,9 @@
 import { formatDateJa, formatWeekKeyJa, getIsoWeekKey } from '../url-utils.js';
 import { createPromptCard, sortPosts } from './list.js';
 
-export function renderWeeklyView({ container, posts, weeklyIssues }) {
+export function renderWeeklyView({ container, posts, weeklyIssues, siteConfig }) {
   container.innerHTML = '';
+  const siteName = siteConfig?.siteName || 'みんなのプロンプト図鑑';
 
   const header = document.createElement('header');
   header.className = 'page-header';
@@ -17,7 +18,7 @@ export function renderWeeklyView({ container, posts, weeklyIssues }) {
   const lead = document.createElement('p');
   lead.className = 'page-lead';
   lead.textContent =
-    'その週に話題になった画像・動画生成プロンプトを週単位で振り返れるまとめページです。過去の膨大な在庫ではなく「今週の鮮度」を大切にしています。';
+    `${siteName}でその週に取り上げた、Xでバズった画像・動画プロンプトを週単位で振り返れるまとめページです。過去の膨大な在庫ではなく「今週の鮮度」を大切にしています。`;
   header.append(h1, lead);
   container.appendChild(header);
 
