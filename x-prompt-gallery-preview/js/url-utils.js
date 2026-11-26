@@ -25,6 +25,15 @@ export const PROMPT_LANGUAGES = Object.freeze({
   other: 'その他',
 });
 
+export const POST_STYLES = Object.freeze({
+  real: '実写系',
+  anime: 'アニメ系',
+  illust: 'イラスト系',
+  cg3d: '3D・CG系',
+  pixel: 'ドット・ゲーム系',
+  other: 'その他',
+});
+
 const ALLOWED_X_HOSTS = new Set([
   'x.com',
   'www.x.com',
@@ -289,6 +298,52 @@ export function getMediaTypeLabel(type) {
  */
 export function getPromptLanguageLabel(lang) {
   return PROMPT_LANGUAGES[lang] || PROMPT_LANGUAGES.other;
+}
+
+/**
+ * Get Japanese label for style ("real" | "anime" | "illust" | "cg3d" | "pixel" | "other").
+ * @param {string} style
+ * @returns {string}
+ */
+export function getStyleLabel(style) {
+  return POST_STYLES[style] || POST_STYLES.other;
+}
+
+/**
+ * Check whether a likes count snapshot is a valid non-negative integer.
+ * @param {unknown} value
+ * @returns {boolean}
+ */
+export function isValidLikesCount(value) {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0;
+}
+
+/**
+ * Format a like count snapshot compactly in Japanese for gallery cards
+ * (e.g. 42000 -> "4.2万", 1250 -> "1,250", 0 -> "0").
+ * Returns null if value is not a valid non-negative integer.
+ * @param {unknown} likes
+ * @returns {string | null}
+ */
+export function formatLikesShortJa(likes) {
+  if (!isValidLikesCount(likes)) return null;
+  if (likes >= 10000) {
+    const man = Math.floor(likes / 1000) / 10;
+    const formatted = Number.isInteger(man) ? man.toLocaleString('ja-JP') : man.toFixed(1);
+    return `${formatted}万`;
+  }
+  return likes.toLocaleString('ja-JP');
+}
+
+/**
+ * Format a like count snapshot with thousands separators for detail metadata (e.g. 42000 -> "42,000").
+ * Returns null if value is not a valid non-negative integer.
+ * @param {unknown} likes
+ * @returns {string | null}
+ */
+export function formatLikesExactJa(likes) {
+  if (!isValidLikesCount(likes)) return null;
+  return likes.toLocaleString('ja-JP');
 }
 
 /**
