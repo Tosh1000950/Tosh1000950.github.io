@@ -26,7 +26,100 @@ import {
   isVideoPost,
   normalizeHandle,
   normalizeImageItem,
+  normalizeTagKey,
 } from '../url-utils.js';
+
+export const DEFAULT_TIER1_TAG_LIMIT = 12;
+
+const tagUiState = {
+  expanded: false,
+  lastAutoExpandedTag: '',
+};
+
+/**
+ * Reset in-memory tier-2 expansion state (used for deterministic tests).
+ */
+export function resetTagUiState() {
+  tagUiState.expanded = false;
+  tagUiState.lastAutoExpandedTag = '';
+}
+
+/**
+ * Partition tags from the current record set into Tier 1 (always visible, up to tier1Limit)
+ * and Tier 2 (collapsed by default).
+ *
+ * Ordering rules (SPEC §5.1):
+ * - Tier 1: pinned tags that actually occur in posts (in siteConfig.pinnedTags order, matched tolerantly),
+ *   followed by remaining tags sorted by usage count descending (ties by name), capped at tier1Limit total.
+ * - Tier 2: all remaining tags sorted by usage count descending (ties by name).
+ * - Counts are computed at runtime as the number of distinct records carrying each tag.
+ *
+ * @param {Array<object>} posts
+ * @param {Array<string>} [pinnedTags=[]]
+ * @param {number} [tier1Limit=DEFAULT_TIER1_TAG_LIMIT]
+ * @returns {{ tier1: Array<{ tag: string, count: number, isPinned: boolean, pinnedIndex: number }>, tier2: Array<{ tag: string, count: number, isPinned: boolean, pinnedIndex: number }>, totalCount: number }}
+ */
+export function buildTieredTags(posts, pinnedTags = [], tier1Limit = DEFAULT_TIER1_TAG_LIMIT) {
+  const safePosts = Array.isArray(posts) ? posts : [];
+  const safePinned = Array.isArray(pinnedTags) ? pinnedTags : [];
+  const limit = Number.isInteger(tier1Limit) && tier1Limit > 0 ? tier1Limit : DEFAULT_TIER1_TAG_LIMIT;
+
+  const pinnedOrder = new Map();
+  safePinned.forEach((rawPinned, idx) => {
+    const key = normalizeTagKey(rawPinned);
+    if (key && !pinnedOrder.has(key)) {
+      pinnedOrder.set(key, idx);
+    }
+  });
+
+  const tagCounts = new Map();
+  safePosts.forEach((post) => {
+    if (!post || !Array.isArray(post.tags)) return;
+    const seenInPost = new Set();
+    post.tags.forEach((rawTag) => {
+      if (typeof rawTag !== 'string') return;
+      const trimmed = rawTag.trim();
+      if (!trimmed || seenInPost.has(trimmed)) return;
+      seenInPost.add(trimmed);
+      tagCounts.set(trimmed, (tagCounts.get(trimmed) || 0) + 1);
+    });
+  });
+
+  const pinnedEntries = [];
+  const regularEntries = [];
+
+  for (const [tag, count] of tagCounts.entries()) {
+    const normKey = normalizeTagKey(tag);
+    const pinnedIndex = normKey && pinnedOrder.has(normKey) ? pinnedOrder.get(normKey) : -1;
+    const entry = {
+      tag,
+      count,
+      isPinned: pinnedIndex !== -1,
+      pinnedIndex,
+    };
+    if (entry.isPinned) {
+      pinnedEntries.push(entry);
+    } else {
+      regularEntries.push(entry);
+    }
+  }
+
+  const compareByCountDescThenName = (a, b) =>
+    b.count - a.count || a.tag.localeCompare(b.tag, 'ja');
+
+  pinnedEntries.sort((a, b) => a.pinnedIndex - b.pinnedIndex || compareByCountDescThenName(a, b));
+  regularEntries.sort(compareByCountDescThenName);
+
+  const ordered = [...pinnedEntries, ...regularEntries];
+  const tier1 = ordered.slice(0, limit);
+  const tier2 = ordered.slice(limit).sort(compareByCountDescThenName);
+
+  return {
+    tier1,
+    tier2,
+    totalCount: tagCounts.size,
+  };
+}
 
 export const SORT_OPTIONS = Object.freeze([
   { value: 'original-desc', label: '元の投稿日（新しい順）' },
@@ -532,15 +625,27 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
     .filter((code) => presentLangSet.has(code))
     .map((code) => ({ value: code, label: getPromptLanguageLabel(code) }));
 
-  const tagCounts = new Map();
-  posts.forEach((p) => {
-    (Array.isArray(p.tags) ? p.tags : []).forEach((t) => {
-      tagCounts.set(t, (tagCounts.get(t) || 0) + 1);
-    });
-  });
-  const sortedTags = [...tagCounts.entries()]
-    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ja'))
-    .map(([tag]) => tag);
+  const activeTag = typeof filters.tag === 'string' ? filters.tag.trim() : '';
+  const { tier1: tier1Tags, tier2: tier2Tags, totalCount: totalTagCount } = buildTieredTags(
+    posts,
+    siteConfig?.pinnedTags,
+    DEFAULT_TIER1_TAG_LIMIT
+  );
+  const selectedTier2Entry = activeTag
+    ? tier2Tags.find((entry) => entry.tag === activeTag) || null
+    : null;
+
+  if (selectedTier2Entry) {
+    if (tagUiState.lastAutoExpandedTag !== activeTag) {
+      tagUiState.expanded = true;
+      tagUiState.lastAutoExpandedTag = activeTag;
+    }
+  } else {
+    tagUiState.lastAutoExpandedTag = '';
+    if (tier2Tags.length === 0) {
+      tagUiState.expanded = false;
+    }
+  }
 
   const activeSort = normalizeSortKey(filters.sort);
   const filtered = sortPosts(
@@ -549,7 +654,12 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
       if (filters.style && (p.style || 'other') !== filters.style) return false;
       if (filters.model && p.model !== filters.model) return false;
       if (filters.language && (p.promptLanguage || 'other') !== filters.language) return false;
-      if (filters.tag && !(Array.isArray(p.tags) && p.tags.includes(filters.tag))) return false;
+      if (
+        activeTag &&
+        !(Array.isArray(p.tags) && p.tags.some((t) => typeof t === 'string' && t.trim() === activeTag))
+      ) {
+        return false;
+      }
       return true;
     }),
     activeSort
@@ -603,31 +713,108 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
 
   filterPanel.appendChild(controls);
 
-  if (sortedTags.length > 0) {
-    const tagRibbon = document.createElement('div');
-    tagRibbon.className = 'tag-ribbon';
-    tagRibbon.setAttribute('role', 'group');
-    tagRibbon.setAttribute('aria-label', 'タグで絞り込み');
+  if (totalTagCount > 0) {
+    const tagSection = document.createElement('div');
+    tagSection.className = 'tag-filter-section';
+    tagSection.setAttribute('role', 'group');
+    tagSection.setAttribute('aria-label', 'タグで絞り込み');
+
+    const createTagChip = (entry, { tier, promoted = false } = {}) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = entry.isPinned ? 'tag-chip tag-chip--pinned' : 'tag-chip';
+      if (promoted) {
+        btn.classList.add('tag-chip--active-promoted');
+      }
+      const isSelected = activeTag === entry.tag;
+      btn.setAttribute('aria-pressed', String(isSelected));
+      btn.dataset.tag = entry.tag;
+      btn.dataset.tagCount = String(entry.count);
+      btn.dataset.tagTier = String(tier);
+      if (entry.isPinned) {
+        btn.dataset.tagPinned = 'true';
+      }
+      btn.title = `${entry.tag}（${entry.count}件）`;
+      btn.textContent = `#${entry.tag}`;
+      btn.addEventListener('click', () => {
+        onFilterChange({ ...filters, tag: isSelected ? '' : entry.tag });
+      });
+      return btn;
+    };
+
+    const tier1Ribbon = document.createElement('div');
+    tier1Ribbon.className = 'tag-ribbon tag-ribbon--tier1';
+    tier1Ribbon.dataset.tagTier = '1';
 
     const ribbonLabel = document.createElement('span');
     ribbonLabel.className = 'tag-ribbon-label';
-    ribbonLabel.textContent = 'タグ:';
-    tagRibbon.appendChild(ribbonLabel);
+    ribbonLabel.textContent = tier2Tags.length > 0 ? '主要タグ:' : 'タグ:';
+    tier1Ribbon.appendChild(ribbonLabel);
 
-    sortedTags.forEach((tag) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'tag-chip';
-      const isSelected = filters.tag === tag;
-      btn.setAttribute('aria-pressed', String(isSelected));
-      btn.textContent = `#${tag}`;
-      btn.addEventListener('click', () => {
-        onFilterChange({ ...filters, tag: isSelected ? '' : tag });
-      });
-      tagRibbon.appendChild(btn);
+    tier1Tags.forEach((entry) => {
+      tier1Ribbon.appendChild(createTagChip(entry, { tier: 1 }));
     });
 
-    filterPanel.appendChild(tagRibbon);
+    let promotedActiveChip = null;
+    if (selectedTier2Entry) {
+      promotedActiveChip = createTagChip(selectedTier2Entry, { tier: 2, promoted: true });
+      promotedActiveChip.hidden = tagUiState.expanded;
+      tier1Ribbon.appendChild(promotedActiveChip);
+    }
+
+    if (tier2Tags.length > 0) {
+      const tier2PanelId = 'tag-tier2-panel';
+      const moreCount = tier2Tags.length;
+
+      const toggleBtn = document.createElement('button');
+      toggleBtn.type = 'button';
+      toggleBtn.className = 'tag-more-toggle';
+      toggleBtn.setAttribute('aria-controls', tier2PanelId);
+
+      const tier2Panel = document.createElement('div');
+      tier2Panel.id = tier2PanelId;
+      tier2Panel.className = 'tag-tier2-panel';
+
+      const tier2Ribbon = document.createElement('div');
+      tier2Ribbon.className = 'tag-ribbon tag-ribbon--tier2';
+      tier2Ribbon.dataset.tagTier = '2';
+      tier2Ribbon.setAttribute('role', 'group');
+      tier2Ribbon.setAttribute('aria-label', 'その他のタグ');
+
+      const tier2Label = document.createElement('span');
+      tier2Label.className = 'tag-ribbon-label';
+      tier2Label.textContent = 'その他:';
+      tier2Ribbon.appendChild(tier2Label);
+
+      tier2Tags.forEach((entry) => {
+        tier2Ribbon.appendChild(createTagChip(entry, { tier: 2 }));
+      });
+
+      tier2Panel.appendChild(tier2Ribbon);
+
+      const syncTier2Visibility = () => {
+        const isOpen = tagUiState.expanded;
+        tier2Panel.hidden = !isOpen;
+        toggleBtn.setAttribute('aria-expanded', String(isOpen));
+        toggleBtn.textContent = isOpen ? 'タグを閉じる' : `タグをもっと見る（+${moreCount}）`;
+        if (promotedActiveChip) {
+          promotedActiveChip.hidden = isOpen;
+        }
+      };
+
+      toggleBtn.addEventListener('click', () => {
+        tagUiState.expanded = !tagUiState.expanded;
+        syncTier2Visibility();
+      });
+
+      syncTier2Visibility();
+      tier1Ribbon.appendChild(toggleBtn);
+      tagSection.append(tier1Ribbon, tier2Panel);
+    } else {
+      tagSection.appendChild(tier1Ribbon);
+    }
+
+    filterPanel.appendChild(tagSection);
   }
 
   const metaRow = document.createElement('div');
