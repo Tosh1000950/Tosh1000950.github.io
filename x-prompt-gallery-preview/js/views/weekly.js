@@ -17,7 +17,7 @@ export function renderWeeklyView({ container, posts, weeklyIssues }) {
   const lead = document.createElement('p');
   lead.className = 'page-lead';
   lead.textContent =
-    'その週に話題になった画像生成プロンプトを週単位で振り返れるまとめページです。過去の膨大な在庫ではなく「今週の鮮度」を大切にしています。';
+    'その週に話題になった画像・動画生成プロンプトを週単位で振り返れるまとめページです。過去の膨大な在庫ではなく「今週の鮮度」を大切にしています。';
   header.append(h1, lead);
   container.appendChild(header);
 
