@@ -16,6 +16,8 @@ import {
   formatDateJa,
   formatLikesExactJa,
   formatLikesShortJa,
+  formatOriginalPostDateJa,
+  getOriginalPostSortMs,
   getPostCardThumbnail,
   getPromptLanguageLabel,
   getStyleLabel,
@@ -66,6 +68,30 @@ function compareDatesAsc(a, b) {
   if (!sa) return 1;
   if (!sb) return -1;
   return sa.localeCompare(sb);
+}
+
+function compareOriginalDatesDesc(a, b) {
+  const ma = getOriginalPostSortMs(a);
+  const mb = getOriginalPostSortMs(b);
+  if (ma !== null && mb !== null) {
+    if (ma === mb) return 0;
+    return mb - ma;
+  }
+  if (ma !== null) return -1;
+  if (mb !== null) return 1;
+  return compareDatesDesc(a?.originalPostedAt, b?.originalPostedAt);
+}
+
+function compareOriginalDatesAsc(a, b) {
+  const ma = getOriginalPostSortMs(a);
+  const mb = getOriginalPostSortMs(b);
+  if (ma !== null && mb !== null) {
+    if (ma === mb) return 0;
+    return ma - mb;
+  }
+  if (ma !== null) return -1;
+  if (mb !== null) return 1;
+  return compareDatesAsc(a?.originalPostedAt, b?.originalPostedAt);
 }
 
 function compareLikesDesc(a, b) {
@@ -249,17 +275,17 @@ export function createPromptCard(post, { sortBy = 'original-desc' } = {}) {
   }
 
   const normalizedSort = normalizeSortKey(sortBy);
-  const dateValue =
-    normalizedSort === 'published-desc'
-      ? post.publishedAt || post.originalPostedAt
-      : post.originalPostedAt || post.publishedAt;
-  if (dateValue) {
+  const showPublishedDate = normalizedSort === 'published-desc' && Boolean(post.publishedAt);
+  if (showPublishedDate || post.originalPostedAt || post.publishedAt) {
     const dateEl = document.createElement('span');
     dateEl.className = 'card-date';
-    dateEl.textContent =
-      normalizedSort === 'published-desc'
-        ? `掲載 ${formatDateJa(dateValue)}`
-        : `投稿 ${formatDateJa(dateValue)}`;
+    if (showPublishedDate) {
+      dateEl.textContent = `掲載 ${formatDateJa(post.publishedAt)}`;
+    } else if (post.originalPostedAt) {
+      dateEl.textContent = `投稿 ${formatOriginalPostDateJa(post.originalPostedAt, post.parentPostUrl)}`;
+    } else {
+      dateEl.textContent = `掲載 ${formatDateJa(post.publishedAt)}`;
+    }
     metaStats.appendChild(dateEl);
   }
 
@@ -319,7 +345,7 @@ export function sortPosts(posts, sortBy = 'original-desc') {
   return [...posts].sort((a, b) => {
     if (key === 'original-asc') {
       return (
-        compareDatesAsc(a.originalPostedAt, b.originalPostedAt) ||
+        compareOriginalDatesAsc(a, b) ||
         compareDatesAsc(a.publishedAt, b.publishedAt) ||
         String(a.id || '').localeCompare(String(b.id || ''))
       );
@@ -328,7 +354,7 @@ export function sortPosts(posts, sortBy = 'original-desc') {
     if (key === 'likes-desc') {
       return (
         compareLikesDesc(a.likesAtCuration, b.likesAtCuration) ||
-        compareDatesDesc(a.originalPostedAt, b.originalPostedAt) ||
+        compareOriginalDatesDesc(a, b) ||
         compareDatesDesc(a.publishedAt, b.publishedAt) ||
         String(b.id || '').localeCompare(String(a.id || ''))
       );
@@ -337,14 +363,14 @@ export function sortPosts(posts, sortBy = 'original-desc') {
     if (key === 'published-desc') {
       return (
         compareDatesDesc(a.publishedAt, b.publishedAt) ||
-        compareDatesDesc(a.originalPostedAt, b.originalPostedAt) ||
+        compareOriginalDatesDesc(a, b) ||
         String(b.id || '').localeCompare(String(a.id || ''))
       );
     }
 
     // Default: original-desc (original post date newest first)
     return (
-      compareDatesDesc(a.originalPostedAt, b.originalPostedAt) ||
+      compareOriginalDatesDesc(a, b) ||
       compareDatesDesc(a.publishedAt, b.publishedAt) ||
       compareLikesDesc(a.likesAtCuration, b.likesAtCuration) ||
       String(b.id || '').localeCompare(String(a.id || ''))
@@ -374,16 +400,16 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
   kicker.className = 'manifesto-kicker';
   kicker.textContent = '三方良しキュレーション';
 
+  const siteName = siteConfig?.siteName || 'みんなのプロンプト図鑑';
   const headline = document.createElement('h1');
   headline.className = 'manifesto-headline';
   headline.textContent =
-    siteConfig?.tagline ||
-    '画像もプロンプトも抜きません。一次ソースはXに置いたまま、作者のポストに返します。';
+    siteConfig?.tagline || 'Xでバズった画像・動画プロンプトを、作者のポストで見る図鑑';
 
   const sub = document.createElement('p');
   sub.className = 'manifesto-sub';
   sub.textContent =
-    '気になる画像・動画サムネイルをタップすると、大きな表示とX公式埋め込みを並べて確認でき、プロンプトの場所案内から元ポストへ迷わず辿れます。';
+    '画像もプロンプトも抜きません。一次ソースはXに置いたまま、大きな表示とX公式埋め込み・プロンプトの場所案内から作者の元ポストへ返します。';
 
   bannerText.append(kicker, headline, sub);
 
@@ -418,7 +444,7 @@ export function renderListView({ container, posts, siteConfig, filters, onFilter
 
     const desc = document.createElement('p');
     desc.textContent =
-      '本サイトは件数ではなく鮮度と作者への還元を重視しています。バズ基準と権利配慮を満たすポストを手作業で選定し、順次公開します。作者ご本人からの自薦も歓迎しています。';
+      `${siteName}は件数ではなく鮮度と作者への還元を重視しています。バズ基準と権利配慮を満たすポストを手作業で選定し、順次公開します。作者ご本人からの自薦も歓迎しています。`;
 
     const actions = document.createElement('div');
     actions.className = 'empty-state-actions';
