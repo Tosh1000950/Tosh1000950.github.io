@@ -25,7 +25,21 @@
       "removalNote": "確認コード方式による掲載削除・修正依頼は専用Webフォーム（Googleフォーム／日英併記）を主窓口とし、メールを補助連絡先として併記する方針で決定済みです。公開準備時に運営者のGoogleアカウントでフォームを作成後、data/posts.json の siteConfig.contact（removalUrl / removalEmail）に設定すると、ここに直接リンクが表示されます。",
       "removalUrl": "",
       "removalEmail": ""
-    }
+    },
+    "pinnedTags": [
+      "ChatGPT",
+      "GPT Image",
+      "Seedance",
+      "Nano Banana",
+      "Midjourney",
+      "Grok",
+      "Veo",
+      "Kling",
+      "Sora",
+      "Imagen",
+      "FLUX",
+      "Stable Diffusion"
+    ]
   },
   "weeklyIssues": [
     {
