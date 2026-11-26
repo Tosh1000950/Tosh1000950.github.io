@@ -12,6 +12,19 @@ export const PROMPT_LOCATION_TYPES = Object.freeze({
   other: '元ポスト周辺（メモ参照）',
 });
 
+export const MEDIA_TYPES = Object.freeze({
+  image: '画像',
+  video: '動画',
+});
+
+export const PROMPT_LANGUAGES = Object.freeze({
+  ja: '日本語',
+  en: '英語',
+  zh: '中国語',
+  ko: '韓国語',
+  other: 'その他',
+});
+
 const ALLOWED_X_HOSTS = new Set([
   'x.com',
   'www.x.com',
@@ -27,6 +40,8 @@ const ALLOWED_PBS_PATHS = [
   '/ext_tw_video_thumb/',
   '/amplify_video_thumb/',
 ];
+
+const VIDEO_FILE_PATH_RE = /\.(mp4|m3u8|webm|mov|m4v|avi|mkv|ogv)(?:$|:)/i;
 
 const ALLOWED_IMAGE_SIZES = new Set([
   'thumb',
@@ -97,7 +112,28 @@ export function getSafeHttpsUrl(rawUrl) {
 }
 
 /**
- * Check if a URL is a valid direct-link X image CDN URL (https://pbs.twimg.com/...).
+ * Check if a URL points to a direct video host/file (strictly forbidden by SPEC §4.2).
+ * @param {string} rawUrl
+ * @returns {boolean}
+ */
+export function isDirectVideoUrl(rawUrl) {
+  if (typeof rawUrl !== 'string' || !rawUrl.trim()) return false;
+  let parsed;
+  try {
+    parsed = new URL(rawUrl.trim());
+  } catch {
+    return false;
+  }
+  const host = parsed.hostname.toLowerCase();
+  if (host === 'video.twimg.com' || host.endsWith('.video.twimg.com')) {
+    return true;
+  }
+  return VIDEO_FILE_PATH_RE.test(parsed.pathname);
+}
+
+/**
+ * Check if a URL is a valid direct-link X image/thumbnail CDN URL (https://pbs.twimg.com/...).
+ * Rejects non-HTTPS URLs, non-pbs.twimg.com hosts, and direct video files.
  * @param {string} rawUrl
  * @returns {boolean}
  */
@@ -111,6 +147,7 @@ export function isPbsImageUrl(rawUrl) {
   }
   if (parsed.protocol !== 'https:') return false;
   if (parsed.hostname.toLowerCase() !== 'pbs.twimg.com') return false;
+  if (VIDEO_FILE_PATH_RE.test(parsed.pathname)) return false;
   return ALLOWED_PBS_PATHS.some((prefix) => parsed.pathname.startsWith(prefix));
 }
 
@@ -155,7 +192,8 @@ export function buildPbsImageUrl(rawUrl, sizeName = 'medium') {
     return parsed.toString();
   }
 
-  // Video thumb / other allowed pbs.twimg.com paths: set `name` query param safely
+  // Video thumb / other allowed pbs.twimg.com paths: strip legacy :size suffix and set `name` query param safely
+  parsed.pathname = pathname.replace(/:[a-z0-9]+$/i, '');
   parsed.searchParams.set('name', safeSize);
   return parsed.toString();
 }
@@ -233,6 +271,81 @@ export function hasSeparatePromptPost(post) {
  */
 export function getPromptLocationLabel(type) {
   return PROMPT_LOCATION_TYPES[type] || PROMPT_LOCATION_TYPES.other;
+}
+
+/**
+ * Get Japanese label for mediaType ("image" | "video").
+ * @param {string} type
+ * @returns {string}
+ */
+export function getMediaTypeLabel(type) {
+  return MEDIA_TYPES[type] || MEDIA_TYPES.image;
+}
+
+/**
+ * Get Japanese label for promptLanguage ("ja" | "en" | "zh" | "ko" | "other").
+ * @param {string} lang
+ * @returns {string}
+ */
+export function getPromptLanguageLabel(lang) {
+  return PROMPT_LANGUAGES[lang] || PROMPT_LANGUAGES.other;
+}
+
+/**
+ * Determine whether a record represents a video post.
+ * @param {{ mediaType?: string }} post
+ * @returns {boolean}
+ */
+export function isVideoPost(post) {
+  return post?.mediaType === 'video';
+}
+
+/**
+ * Get the primary direct-link thumbnail image for a card (videoThumbnail for video posts, images[0] for image posts).
+ * @param {object} post
+ * @returns {{ url: string, alt: string } | null}
+ */
+export function getPostCardThumbnail(post) {
+  if (!post) return null;
+  const fallbackAlt = post.title || '';
+  if (isVideoPost(post)) {
+    const thumb = normalizeImageItem(post.videoThumbnail, fallbackAlt);
+    if (thumb) return thumb;
+  }
+  const images = Array.isArray(post.images) ? post.images : [];
+  for (const item of images) {
+    const normalized = normalizeImageItem(item, fallbackAlt);
+    if (normalized) return normalized;
+  }
+  return null;
+}
+
+/**
+ * Get all direct-link still images / video thumbnail to render in the detail left column.
+ * Never includes direct video streams.
+ * @param {object} post
+ * @returns {Array<{ url: string, alt: string }>}
+ */
+export function getPostMediaGallery(post) {
+  if (!post) return [];
+  const fallbackAlt = post.title || '';
+  const list = [];
+  const seen = new Set();
+
+  const pushUnique = (rawItem) => {
+    const item = normalizeImageItem(rawItem, fallbackAlt);
+    if (!item || seen.has(item.url)) return;
+    seen.add(item.url);
+    list.push(item);
+  };
+
+  if (isVideoPost(post) && post.videoThumbnail) {
+    pushUnique(post.videoThumbnail);
+  }
+  if (Array.isArray(post.images)) {
+    post.images.forEach(pushUnique);
+  }
+  return list;
 }
 
 /**
