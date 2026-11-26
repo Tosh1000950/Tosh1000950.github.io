@@ -12,6 +12,8 @@ import { renderWeeklyView } from './views/weekly.js';
 
 const DATA_URL = './data/posts.json';
 const THEME_STORAGE_KEY = 'xpg-theme';
+const DEFAULT_SITE_NAME = 'みんなのプロンプト図鑑';
+const DEFAULT_SITE_TAGLINE = 'Xでバズった画像・動画プロンプトを、作者のポストで見る図鑑';
 
 const state = {
   siteConfig: null,
@@ -72,7 +74,7 @@ function initThemeController() {
 
 function applySiteConfig(config) {
   if (!config) return;
-  const siteName = config.siteName || '【仮称】Xバズプロンプト図鑑';
+  const siteName = config.siteName || DEFAULT_SITE_NAME;
   dom.brandTitle.textContent = siteName;
   dom.footerBrandName.textContent = siteName;
 
@@ -117,8 +119,9 @@ function updateNavCurrent(routeKey) {
 }
 
 function setDocumentTitle(pagePrefix) {
-  const base = state.siteConfig?.siteName || '【仮称】Xバズプロンプト図鑑';
-  document.title = pagePrefix ? `${pagePrefix} | ${base}` : base;
+  const base = state.siteConfig?.siteName || DEFAULT_SITE_NAME;
+  const tagline = state.siteConfig?.tagline || DEFAULT_SITE_TAGLINE;
+  document.title = pagePrefix ? `${pagePrefix} | ${base}` : `${base}｜${tagline}`;
 }
 
 function renderBaseView(route) {
@@ -147,6 +150,7 @@ function renderBaseView(route) {
       container: dom.main,
       posts: state.posts,
       weeklyIssues: state.weeklyIssues,
+      siteConfig: state.siteConfig,
     });
     return;
   }
