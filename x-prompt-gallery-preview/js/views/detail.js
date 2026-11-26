@@ -16,11 +16,14 @@ import {
   buildPbsImageUrl,
   extractTweetId,
   formatDateJa,
+  getMediaTypeLabel,
+  getPostMediaGallery,
+  getPromptLanguageLabel,
   getPromptLocationLabel,
   getSafeXUrl,
   hasSeparatePromptPost,
+  isVideoPost,
   normalizeHandle,
-  normalizeImageItem,
 } from '../url-utils.js';
 
 let activeController = null;
@@ -50,6 +53,7 @@ export function openDetailModal({ overlayRoot, post, theme, onClose, onSelectTag
   const safeParentUrl = getSafeXUrl(post.parentPostUrl);
   const safePromptUrl = getSafeXUrl(post.promptPostUrl) || safeParentUrl;
   const isThread = hasSeparatePromptPost(post);
+  const isVideo = isVideoPost(post);
 
   // Sticky Header
   const header = document.createElement('div');
@@ -89,15 +93,13 @@ export function openDetailModal({ overlayRoot, post, theme, onClose, onSelectTag
   const layout = document.createElement('div');
   layout.className = 'detail-layout';
 
-  // ---------------- LEFT COLUMN: Large Direct-Linked Image + Editorial Meta ----------------
+  // ---------------- LEFT COLUMN: Large Direct-Linked Image / Video Thumbnail + Editorial Meta ----------------
   const leftCol = document.createElement('div');
   leftCol.className = 'detail-left';
 
-  const images = (Array.isArray(post.images) ? post.images : [])
-    .map((item) => normalizeImageItem(item, post.title))
-    .filter(Boolean);
+  const mediaGallery = getPostMediaGallery(post);
 
-  leftCol.appendChild(buildImageViewer(images, post.title));
+  leftCol.appendChild(buildImageViewer(mediaGallery, post.title, { isVideo }));
   leftCol.appendChild(buildEditorialBlock(post, onSelectTag, onClose));
 
   // ---------------- RIGHT COLUMN: Prompt Location Guidance + Official X Embed(s) ----------------
@@ -177,7 +179,9 @@ export function openDetailModal({ overlayRoot, post, theme, onClose, onSelectTag
 
   if (isThread) {
     const parentBlock = createEmbedBlock({
-      label: 'X公式埋め込み ①：親ポスト（作品）',
+      label: isVideo
+        ? 'X公式埋め込み ①：親ポスト（動画作品・ここで再生）'
+        : 'X公式埋め込み ①：親ポスト（作品）',
       postUrl: safeParentUrl,
       slotTestId: 'embed-slot-parent',
     });
@@ -203,7 +207,7 @@ export function openDetailModal({ overlayRoot, post, theme, onClose, onSelectTag
     );
   } else {
     const singleBlock = createEmbedBlock({
-      label: 'X公式埋め込み（元ポスト）',
+      label: isVideo ? 'X公式埋め込み（元ポスト・ここで動画再生）' : 'X公式埋め込み（元ポスト）',
       postUrl: safeParentUrl,
       slotTestId: 'embed-slot-parent',
     });
@@ -218,17 +222,32 @@ export function openDetailModal({ overlayRoot, post, theme, onClose, onSelectTag
 
   rightCol.appendChild(embedSection);
 
-  // Removal / correction link at the bottom of the detail dialog
+  // Removal / correction link at the bottom of the detail dialog (with concise EN marker per A+ Phase 1)
   const detailFooter = document.createElement('div');
   detailFooter.className = 'detail-footer-bar';
   const rightsNote = document.createElement('span');
-  rightsNote.textContent = '画像・プロンプトの権利は元の作者に帰属します。';
+  rightsNote.textContent = '画像・動画・プロンプトの権利は元の作者に帰属します。';
+
+  const footerLinks = document.createElement('div');
+  footerLinks.className = 'detail-footer-links';
+
   const removalLink = document.createElement('a');
   removalLink.href = safeParentUrl
     ? `#/removal?post=${encodeURIComponent(safeParentUrl)}`
     : '#/removal';
   removalLink.textContent = 'この掲載の削除・修正を依頼する';
-  detailFooter.append(rightsNote, removalLink);
+
+  const removalEnLink = document.createElement('a');
+  removalEnLink.className = 'detail-footer-en-link';
+  removalEnLink.setAttribute('lang', 'en');
+  removalEnLink.href = safeParentUrl
+    ? `#/removal?post=${encodeURIComponent(safeParentUrl)}&lang=en`
+    : '#/removal?lang=en';
+  removalEnLink.textContent = 'Removal (EN)';
+  removalEnLink.setAttribute('aria-label', 'Request removal or correction in English');
+
+  footerLinks.append(removalLink, removalEnLink);
+  detailFooter.append(rightsNote, footerLinks);
 
   layout.append(leftCol, rightCol);
   body.append(layout, detailFooter);
@@ -352,7 +371,7 @@ function createEmbedBlock({ label, postUrl, slotTestId }) {
   return { block, slot };
 }
 
-function buildImageViewer(images, fallbackTitle) {
+function buildImageViewer(images, fallbackTitle, { isVideo = false } = {}) {
   const frag = document.createDocumentFragment();
   let currentIndex = 0;
 
@@ -378,11 +397,18 @@ function buildImageViewer(images, fallbackTitle) {
       img.referrerPolicy = 'no-referrer';
       img.addEventListener('error', () => {
         img.remove();
-        stage.appendChild(createDetailImageFallback());
+        stage.appendChild(createDetailImageFallback(isVideo));
       });
       stage.appendChild(img);
     } else {
-      stage.appendChild(createDetailImageFallback());
+      stage.appendChild(createDetailImageFallback(isVideo));
+    }
+
+    if (isVideo) {
+      const videoTag = document.createElement('span');
+      videoTag.className = 'detail-video-badge';
+      videoTag.textContent = '▶ 動画サムネイル';
+      stage.appendChild(videoTag);
     }
 
     if (images.length > 1) {
@@ -393,6 +419,14 @@ function buildImageViewer(images, fallbackTitle) {
 
   renderMainImage(0);
   frag.appendChild(stage);
+
+  if (isVideo) {
+    const videoNote = document.createElement('p');
+    videoNote.className = 'detail-video-note';
+    videoNote.textContent =
+      '▶ 動画ポスト：動画の再生は右側（モバイルでは下）のX公式埋め込み内で行えます。本サイトは動画ファイルを保持・直接再生しません。';
+    frag.appendChild(videoNote);
+  }
 
   if (images.length > 1) {
     const thumbs = document.createElement('div');
@@ -432,7 +466,7 @@ function buildImageViewer(images, fallbackTitle) {
   return frag;
 }
 
-function createDetailImageFallback() {
+function createDetailImageFallback(isVideo = false) {
   const wrap = document.createElement('div');
   wrap.className = 'card-img-fallback';
   wrap.style.position = 'static';
@@ -441,10 +475,14 @@ function createDetailImageFallback() {
 
   const title = document.createElement('span');
   title.className = 'card-img-fallback-title';
-  title.textContent = '直リンク画像を読み込めませんでした';
+  title.textContent = isVideo
+    ? '動画サムネイルを読み込めませんでした'
+    : '直リンク画像を読み込めませんでした';
 
   const sub = document.createElement('span');
-  sub.textContent = '元ポストの削除や通信状況により表示できない場合があります。右側の公式埋め込みまたは「Xで開く」をご確認ください。';
+  sub.textContent = isVideo
+    ? '右側のX公式埋め込みから動画を再生・確認するか、「Xで開く」をご利用ください。'
+    : '元ポストの削除や通信状況により表示できない場合があります。右側の公式埋め込みまたは「Xで開く」をご確認ください。';
 
   wrap.append(title, sub);
   return wrap;
@@ -530,13 +568,15 @@ function buildEditorialBlock(post, onSelectTag, onClose) {
   authorCard.append(authorInfo, authorActions);
   wrap.appendChild(authorCard);
 
-  // Meta info grid (SPEC §5.2 items 8 & 9)
+  // Meta info grid (SPEC §5.2 items 8, 9, 10 & 11)
   const dl = document.createElement('dl');
   dl.className = 'detail-meta-grid';
 
   const metaEntries = [
     ['対応モデル', post.model],
     ['カテゴリ', post.category],
+    ['媒体', getMediaTypeLabel(post.mediaType)],
+    ['プロンプト言語', getPromptLanguageLabel(post.promptLanguage)],
     ['掲載日', formatDateJa(post.publishedAt)],
     ['元の投稿日', formatDateJa(post.originalPostedAt)],
   ];
